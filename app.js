@@ -285,6 +285,16 @@ const imgTag = (src, cls = '', alt = '') => src ? `<img loading="lazy" decoding=
 function chips(key, opts, cur) {
   return `<div class="chips" data-key="${key}">${opts.map(([v, l]) => `<button class="chip ${String(cur) === String(v) ? 'on' : ''}" data-v="${esc(v)}">${esc(l)}</button>`).join('')}</div>`;
 }
+/* compact filter: native dropdown styled as a chip (iOS shows its wheel picker) */
+function fsel(key, opts) {
+  const cur = String(ui(key, 'all'));
+  return `<label class="fsel ${cur !== 'all' ? 'on' : ''}"><select data-key="${key}" aria-label="${esc(opts[0][1])}">${opts.map(([v, l]) => `<option value="${esc(v)}"${String(v) === cur ? ' selected' : ''}>${esc(l)}</option>`).join('')}</select></label>`;
+}
+function wireSelects(root, redraw) {
+  root.querySelectorAll('.fsel select').forEach(sel => sel.addEventListener('change', () => {
+    setUi(sel.dataset.key, sel.value); sel.parentElement.classList.toggle('on', sel.value !== 'all'); redraw();
+  }));
+}
 function wireChips(root, rerender) {
   root.querySelectorAll('.chips').forEach(c => c.addEventListener('click', e => {
     const b = e.target.closest('.chip'); if (!b) return;
@@ -675,10 +685,12 @@ V.cards = () => {
   const page = () => {
     const { view, draw } = listPage(() => `
       ${searchBox('cq', 'Search cards or text')}
-      ${chips('ccolor', [['all', 'All'], ...colors.map(c => [c, colorName(c)])], ui('ccolor', 'all'))}
-      ${chips('ctype', [['all', 'Any type'], ...['Attack', 'Skill', 'Power', 'Status', 'Curse', 'Quest'].filter(t => D.cards.some(c => c.type === t)).map(t => [t, t])], ui('ctype', 'all'))}
-      ${chips('crar', [['all', 'Any rarity'], ...['Basic', 'Common', 'Uncommon', 'Rare', 'Ancient', 'Event', 'Token'].filter(r => D.cards.some(c => c.rarity === r)).map(r => [r, r])], ui('crar', 'all'))}
-      <div class="row-between" style="margin-top:8px"><label class="toggle"><input type="checkbox" id="upT" ${ui('cup', false) ? 'checked' : ''}> Show upgraded</label></div>`, () => {
+      <div class="frow">
+        ${fsel('ccolor', [['all', 'Character'], ...colors.map(c => [c, colorName(c)])])}
+        ${fsel('ctype', [['all', 'Type'], ...['Attack', 'Skill', 'Power', 'Status', 'Curse', 'Quest'].filter(t => D.cards.some(c => c.type === t)).map(t => [t, t])])}
+        ${fsel('crar', [['all', 'Rarity'], ...['Basic', 'Common', 'Uncommon', 'Rare', 'Ancient', 'Event', 'Token'].filter(r => D.cards.some(c => c.rarity === r)).map(r => [r, r])])}
+        <button type="button" id="upT" class="fbtn ${ui('cup', false) ? 'on' : ''}" aria-pressed="${!!ui('cup', false)}">Upgraded</button>
+      </div>`, () => {
       const q = norm(ui('cq', '')), col = ui('ccolor', 'all'), ty = ui('ctype', 'all'), ra = ui('crar', 'all'), up = ui('cup', false);
       const list = D.cards.filter(c => (col === 'all' || c.color === col) && (ty === 'all' || c.type === ty) && (ra === 'all' || c.rarity === ra) &&
         (!q || norm(c.name).includes(q) || norm(strip(c.desc)).includes(q) || norm(strip(c.udesc)).includes(q)))
@@ -690,7 +702,8 @@ V.cards = () => {
       }).join('')}</div>${list.length > 400 ? '<div class="note">Showing first 400. Narrow the filters to see more.</div>' : ''}`;
     });
     wireChips(view, page); wireSearch(view, 'cq', draw, q => rank(D.cards, q, c => c.name).map(c => ({ label: c.name, sub: `${c.rarity || ''} ${c.type || ''} · ${colorName(c.color)}`, href: '#/card/' + c.id })));
-    $('#upT').addEventListener('change', e => { setUi('cup', e.target.checked); draw(); });
+    $('#upT').addEventListener('click', e => { const on = !ui('cup', false); setUi('cup', on); e.currentTarget.classList.toggle('on', on); e.currentTarget.setAttribute('aria-pressed', on); draw(); });
+    wireSelects(view, draw);
     draw();
   };
   page();

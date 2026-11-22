@@ -352,3 +352,15 @@ h1 { font-size: 25px; }
 .enc .who b { color: var(--text); }
 /* card list: cost orb centred vertically in the row */
 .item.cardrow { align-items: center; }
+
+/* compact filter row (cards tab) */
+.frow { display: flex; gap: 6px; margin-top: 8px; }
+.fsel { position: relative; flex: 1 1 0; min-width: 0; }
+.fsel select { -webkit-appearance: none; appearance: none; width: 100%; font: 600 13px/1 -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  color: var(--muted); background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 8px 22px 8px 11px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; outline: none; }
+.fsel::after { content: '▾'; position: absolute; right: 9px; top: 50%; transform: translateY(-50%); font-size: 11px; color: var(--faint); pointer-events: none; }
+.fsel.on select { background: var(--text); color: var(--bg); border-color: var(--text); }
+.fsel.on::after { color: var(--bg); }
+.fbtn { flex: none; border: 1px solid var(--line); background: var(--card); color: var(--muted); border-radius: 999px; padding: 0 12px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.fbtn.on { background: #1f5923; border-color: #7fff00; color: #7fff00; }
