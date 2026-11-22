@@ -130,15 +130,16 @@ h3 { font-size: 16px; margin: 0; }
 .r-Status, .r-Token, .r-Quest { color: var(--muted); }
 
 /* game text */
-.t-gold { color: var(--gold); font-weight: 600; }
-.t-blue { color: var(--blue); font-weight: 600; }
-.t-red { color: var(--red); font-weight: 600; }
-.t-green { color: var(--green); font-weight: 600; }
-.t-purple { color: var(--purple); }
-.t-orange { color: var(--orange); }
-.t-aqua { color: var(--aqua); }
-.t-pink { color: var(--pink); }
-.t-up { color: var(--green); font-weight: 700; }
+/* exact in-game text colours */
+.t-gold { color: #efc851; }
+.t-blue { color: #87ceeb; }
+.t-red { color: #ff5555; }
+.t-green { color: #7fff00; }
+.t-purple { color: #ee82ee; }
+.t-orange { color: #ffa518; }
+.t-aqua { color: #2aebbe; }
+.t-pink { color: #ff78a0; }
+.t-up { color: #7fff00; }
 .energy { display: inline-flex; align-items: center; justify-content: center; min-width: 17px; height: 17px; border-radius: 50%; background: #c2541f; color: #fff; font-size: 11px; font-weight: 800; padding: 0 3px; vertical-align: -2px; }
 .starico { color: var(--gold); font-weight: 800; }
 
@@ -256,6 +257,56 @@ h1 { font-size: 25px; }
 .item.cardrow { border-color: color-mix(in srgb, var(--cc) 55%, var(--line)); background: linear-gradient(90deg, color-mix(in srgb, var(--cc) 16%, var(--card)), var(--card) 55%); border-left: 4px solid var(--cc); }
 .item.cardrow .cost { border-color: var(--cc); }
 
+/* in-game card: real frame pieces on the game's 300×422 canvas, scaled to fit */
+.gcard-wrap { width: min(320px, 84vw); margin: 14px auto 6px; position: relative; }
+.gcard { position: absolute; left: 0; top: 0; width: 300px; height: 422px; transform-origin: 0 0;
+  font-family: 'Kreon', Georgia, serif; text-rendering: geometricPrecision; font-kerning: normal; user-select: none; }
+.gcard .gl { position: absolute; max-width: none; display: block; pointer-events: none; }
+.gc-svg { position: absolute; left: 0; top: 0; overflow: visible; pointer-events: none; }
+.gc-desc { position: absolute; display: flex; align-items: center; justify-content: center; text-align: center;
+  color: #fff6e2; text-shadow: 2px 2px 0 rgba(0,0,0,.35); overflow-wrap: break-word; }
+.gc-desc-in { width: 100%; font-weight: 400; font-size: 21px; line-height: calc(1em * 61 / 48 - 3px); }
+.gc-ico { display: inline-block; width: 24px; height: 24px; vertical-align: -5px; margin: 0 1px; }
+.gc-plaque { position: absolute; box-sizing: border-box; border-style: solid; border-width: 0 12px 0 13px;
+  border-image-slice: 0 24 0 26 fill; border-image-width: 0 12px 0 13px; }
+.gc-plaque span { position: absolute; left: 50%; top: 50%; transform: translate(calc(-50% - .25px), calc(-50% - 1.5px));
+  white-space: nowrap; font-weight: 700; font-size: 16px; line-height: 1.2; color: rgba(0,0,0,.753); }
+
+/* Game title font (Kreon Bold, as used by Slay the Spire 2) for names and titles only */
+.brand, h1, .nm, .tile .name, .enc .body > b, .hero h1 {
+  font-family: 'Kreon', Georgia, 'Times New Roman', serif; font-weight: 700; letter-spacing: .01em;
+}
+h1 { font-size: 25px; }
+.tile .name { font-size: 16px; }
+.item .title .nm { font-size: 16.5px; }
+.enc .body > b { font-size: 16px; }
+
+/* search with clear button + suggestions */
+.sbox { position: relative; }
+.sbox .search { padding-right: 40px; -webkit-appearance: none; appearance: none; }
+.sclear { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 30px; height: 30px; border: 0; border-radius: 50%; background: var(--card2); color: var(--muted); font-size: 18px; line-height: 1; cursor: pointer; }
+.sclear[hidden] { display: none; }
+.sugg { position: absolute; left: 0; right: 0; top: calc(100% + 4px); z-index: 15; background: var(--card2); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,.5); }
+.sugg[hidden] { display: none; }
+.sg { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-top: 1px solid var(--line); cursor: pointer; }
+.sg:first-child { border-top: 0; }
+.sg:active, .sg:hover { background: var(--card); }
+.sg .nm { flex: 1; min-width: 0; font-size: 16px; color: var(--muted); }
+.sg .nm b { color: var(--text); }
+.sg small { color: var(--faint); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 45%; }
+.sgi { width: 26px; height: 26px; object-fit: contain; flex: none; }
+
+/* Neowsletter */
+.news { line-height: 1.6; }
+.news .nimg { max-width: 100%; height: auto; border-radius: 8px; margin: 8px 0; }
+.news .nh { font-size: 19px; margin: 14px 0 4px; }
+.news ul { padding-left: 20px; margin: 6px 0; }
+.news hr { border: 0; border-top: 1px solid var(--line); margin: 14px 0; }
+
+/* ---- cards: per-character frame colour ---- */
+.item.cardrow { border-color: color-mix(in srgb, var(--cc) 55%, var(--line)); background: linear-gradient(90deg, color-mix(in srgb, var(--cc) 16%, var(--card)), var(--card) 55%); border-left: 4px solid var(--cc); }
+.item.cardrow .cost { border-color: var(--cc); }
+
 /* in-game style card */
 .gcard { --cc: #8a7f70; width: min(300px, 82vw); margin: 12px auto 6px; aspect-ratio: 5 / 7; border-radius: 18px; padding: 10px 12px 14px; position: relative;
   background: linear-gradient(170deg, color-mix(in srgb, var(--cc) 80%, #fff 8%), color-mix(in srgb, var(--cc) 55%, #000) 70%);
@@ -274,3 +325,24 @@ h1 { font-size: 25px; }
 .gcard.pow .gc-art { border-radius: 50% 50% 46% 46% / 60% 60% 40% 40%; }
 .gc-type { align-self: center; margin-top: -10px; position: relative; z-index: 2; background: #2a2219; border: 2px solid #1e170f; border-radius: 999px; padding: 1px 12px; font-size: 12px; font-weight: 700; color: #e9dcc4; }
 .gc-text { flex: 1; margin: 8px 4px 0; background: rgba(20,16,12,.82); border: 2px solid #1e170f; border-radius: 8px; padding: 10px 12px; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 15px; line-height: 1.4; color: #f3ead9; }
+
+/* ---- game typography: Kreon like the game, for game text and names only ---- */
+.desc, .gtext, .opt-ev, .pw .sub, .panel.gtext, .news, .branch .cond + .x {
+  font-family: 'Kreon', Georgia, serif; font-weight: 400; color: #fff6e2; text-shadow: 1px 1px 0 rgba(0,0,0,.35); }
+.item .desc { font-size: 15px; line-height: 1.35; opacity: 1; }
+.opt-ev b { font-weight: 700; }
+.tico { display: inline-block; width: 1.25em; height: 1.25em; vertical-align: -.3em; margin: 0 1px; }
+/* names: Kreon Bold with the game's dark outline; card names Kreon Regular like the card title */
+.nm, h1, .tile .name, .enc .body > b { text-shadow: 0 0 2px rgba(0,0,0,.9), 1px 1px 0 rgba(0,0,0,.6); }
+.item.cardrow .nm { font-weight: 400; font-size: 18px; }
+/* hover-tip style (relics, potions, powers, enchantments, keywords): gold Kreon Bold title */
+#view[data-p=relics] .nm, #view[data-p=relic] h1, #view[data-p=potions] .nm, #view[data-p=powers] .nm,
+#view[data-p=enchantments] .nm, #view[data-p=ancient] .item .nm, #view[data-p=event] .item:not(.cardrow) .nm { color: #efc851; }
+/* energy-orb cost bubbles */
+.cost.orb { background: center / contain no-repeat; border: 0; border-radius: 0; width: 34px; height: 34px;
+  font-family: 'Kreon', Georgia, serif; font-weight: 700; font-size: 19px; color: #fff6e2; padding-bottom: 2px;
+  text-shadow: -1.5px -1.5px 0 var(--eo), 1.5px -1.5px 0 var(--eo), -1.5px 1.5px 0 var(--eo), 1.5px 1.5px 0 var(--eo), 0 1.5px 0 var(--eo), 0 -1.5px 0 var(--eo), 1.5px 0 0 var(--eo), -1.5px 0 0 var(--eo); }
+.cost.orb.changed { color: #7fff00; --eo: #1f5923; }
+.cost.orb.star { --eo: rgba(23,85,97,.86); font-size: 15px; }
+.cost.none { visibility: hidden; }
+.item.cardrow .cost { border: 0; }

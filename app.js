@@ -73,13 +73,14 @@ const title = id => String(id || '').toLowerCase().split('_').map(w => w[0]?.toU
 
 /* ---------------- game text ---------------- */
 const COLORS = ['gold', 'blue', 'red', 'green', 'purple', 'orange', 'aqua', 'pink'];
-function fmt(s) {
+function fmt(s, energy = 'colorless') {
   if (s == null) return '';
   let h = esc(String(s).replaceAll('[Amount]', 'X').replace(/\[(TargetPlayer|ApplierName)\]/g, 'the target').replace(/\[Card\]/g, 'a card'));
   for (const c of COLORS) h = h.replaceAll(`[${c}]`, `<span class="t-${c}">`).replaceAll(`[/${c}]`, '</span>');
   h = h.replace(/\[b\]/g, '<b>').replace(/\[\/b\]/g, '</b>').replace(/\[i\]/g, '<i>').replace(/\[\/i\]/g, '</i>');
-  h = h.replace(/\[energy:(\d+)\]/g, (_, n) => `<span class="energy">${n}</span>`);
-  h = h.replace(/\[star:(\d+)\]/g, (_, n) => `<span class="starico">${n}★</span>`);
+  const ico = (src, n) => { const k = parseInt(n, 10); const many = Number.isNaN(k) || k <= 0 || k >= 5; return (many ? `<span>${esc(n)}</span>` : '') + `<img class="tico" src="${src}" alt="">`.repeat(many ? 1 : k); };
+  h = h.replace(/\[energy:(\w+)\]/g, (_, n) => ico(`https://cdn.spire-codex.com/icons/${energy}_energy_icon.webp`, n));
+  h = h.replace(/\[star:(\w+)\]/g, (_, n) => ico('https://cdn.spire-codex.com/icons/star_icon.webp', n));
   h = h.replace(/\[\/?[a-z_]+(?:=[^\]]*)?\]/g, '');
   return h.replace(/\n/g, '<br>');
 }
@@ -423,7 +424,7 @@ function dreadPanel(m) {
   return `<h2>Dread</h2><div class="panel">${boss
     ? '<div class="sub" style="margin-bottom:6px">Its Dominion: enemies earlier in the act gain this when it is the upcoming boss.</div>'
     : `<div class="sub" style="margin-bottom:6px">Gains the upcoming boss's Dominion${doms.length > 1 ? ', one of:' : ':'}</div>`}
-    ${doms.map(d => `<div style="margin-top:6px"><b class="nm">${esc(d.name)}</b><div class="sub">${fmt(d.description)}</div></div>`).join('')}</div>`;
+    ${doms.map(d => `<div style="margin-top:6px"><b class="nm">${esc(d.name)}</b><div class="gtext">${fmt(d.description)}</div></div>`).join('')}</div>`;
 }
 
 V.enemy = (id) => {
@@ -499,36 +500,131 @@ function cardColor(c) {
   const ch = (S.D.characters || []).find(x => x.id.toLowerCase() === c.color);
   return CHAR_FALLBACK[ch?.color] || '#8a7f70';
 }
-/* Upgraded text with the numbers that changed shown in green, like the in-game upgrade preview */
-function upDiff(base, up) {
-  const num = /(\d+)/g;
-  const a = String(base || '').split(num), b = String(up || '').split(num);
-  if (a.length !== b.length) return fmt(up);
-  const mark = '\u0001', end = '\u0002';
-  const merged = b.map((t, i) => (i % 2 === 1 && t !== a[i]) ? mark + t + end : t).join('');
-  return fmt(merged).replace(/\u0001/g, '<span class="t-up">').replace(/\u0002/g, '</span>');
+/* ---- In-game card render ----
+   Layered from the game's own card-frame pieces (served by Spire Codex), positioned on the game's
+   300×422 card canvas. Layout numbers adapted from Spire Codex's CardRender (PolyForm Noncommercial,
+   © Peter Lord and Spire Codex contributors). */
+const FR = n => `https://cdn.spire-codex.com/card-frames/${n}.webp`;
+const ICON = n => `https://cdn.spire-codex.com/icons/${n}.webp`;
+const CW = 300, CH = 422, CX = 150, CY = 211;
+const GAME_COLORS = { gold: '#efc851', red: '#ff5555', green: '#7fff00', blue: '#87ceeb', purple: '#ee82ee', orange: '#ffa518', pink: '#ff78a0', aqua: '#2aebbe' };
+const TITLE_OUTLINE = { common: '#4d4b40', uncommon: '#005c75', rare: '#6b4b00', curse: '#550b9e', quest: '#7e3e15', status: '#4f522f', event: '#1b6131', ancient: '#4d4b40' };
+const ENERGY_OUTLINE = { ironclad: '#802020', silent: '#1a6625', regent: '#803d0e', necrobinder: '#803367', defect: '#1d5673', fool: '#5a4411', quest: '#431e14', colorless: '#5c5440' };
+const ENERGY_BOX = { colorless: [74, 74, 1, 2, 71, 71], defect: [74, 74, 1, 1, 71, 72], necrobinder: [74, 74, 0, 3, 74, 69] };
+const CHARS6 = ['ironclad', 'silent', 'defect', 'necrobinder', 'regent', 'fool'];
+const KW_BEFORE = ['Unplayable', 'Innate', 'Retain', 'Sly', 'Ethereal'], KW_AFTER = ['Exhaust', 'Eternal'];
+const bx = (l, t, w, h) => `left:${l + CX}px;top:${t + CY}px;width:${w}px;height:${h}px`;
+const kreonBase = (top, height, size) => top + (height - (61 / 48) * size - 3) / 2 + (47 / 48) * size;
+
+function energyOf(c) { return CHARS6.includes(c.color) ? c.color : c.color === 'quest' ? 'quest' : 'colorless'; }
+function svgText(text, x, y, size, weight, fill, stroke, radius, fit) {
+  const common = `x="${x + CX}" y="${y + CY}" text-anchor="middle" font-family="Kreon, Georgia, serif" font-size="${size}" font-weight="${weight}" stroke-width="${radius * 2}" stroke-linejoin="round" paint-order="stroke"${fit ? ` data-fit="${fit}"` : ''}`;
+  return `<svg class="gc-svg" width="${CW}" height="${CH}" aria-hidden="true"><g opacity="0.188" transform="translate(2 2)"><text ${common} fill="#000" stroke="#000">${esc(text)}</text></g><text ${common} fill="${fill}" stroke="${stroke}">${esc(text)}</text></svg>`;
+}
+/* game rich text: [gold]..[/gold] colours, [energy:n]/[star:n] icons; numbers that changed on upgrade in green */
+function cardText(src, energy, baseSrc) {
+  let s = String(src || '');
+  if (baseSrc != null) {   // mark numbers that differ from the base text
+    const a = String(baseSrc).split(/(\d+)/), b = s.split(/(\d+)/);
+    if (a.length === b.length) s = b.map((t, i) => (i % 2 && t !== a[i]) ? `\u0001${t}\u0002` : t).join('');
+  }
+  let h = esc(s);
+  for (const [k, v] of Object.entries(GAME_COLORS)) h = h.replaceAll(`[${k}]`, `<span style="color:${v}">`).replaceAll(`[/${k}]`, '</span>');
+  const icon = (src, n, g) => {
+    const num = parseInt(n, 10), counted = n !== 'X' && !Number.isNaN(num), numbered = counted && (num <= 0 || num >= 5);
+    const reps = !counted || numbered ? 1 : num;
+    return (numbered ? `<span${g ? ` style="color:${GAME_COLORS.green}"` : ''}>${num}</span>` : '') + `<img class="gc-ico" src="${src}" alt="">`.repeat(reps);
+  };
+  h = h.replace(/\[energy:(\w+)\]/g, (_, n) => icon(ICON(`${energy}_energy_icon`), n)).replace(/\[star:(\w+)\]/g, (_, n) => icon(ICON('star_icon'), n));
+  h = h.replace(/\[\/?[a-z_]+(?:=[^\]]*)?\]/g, '');
+  h = h.replace(/\u0001/g, `<span style="color:${GAME_COLORS.green}">`).replace(/\u0002/g, '</span>');
+  return h.split('\n').map(p => `<div>${p || '&#8203;'}</div>`).join('');
+}
+function cardKeywords(c, up) {
+  const kw = new Set(c.kw || []);
+  const u = up ? (c.up || {}) : {};
+  if (u.add_innate) kw.add('Innate'); if (u.add_retain) kw.add('Retain'); if (u.add_exhaust === true) kw.add('Exhaust');
+  if (u.remove_exhaust) kw.delete('Exhaust'); if (u.remove_ethereal) kw.delete('Ethereal'); if (u.remove_innate) kw.delete('Innate'); if (u.remove_retain) kw.delete('Retain');
+  if (c.cost == null || c.cost < 0) { if (c.type === 'Status' || c.type === 'Curse') kw.add('Unplayable'); }
+  return kw;
 }
 function gameCard(c, up) {
-  const art = S.branch === 'beta' && c.bimg ? c.bimg : c.img;
-  const text = up ? upDiff(c.desc, upText(c) || c.desc) : fmt(c.desc);
-  const shape = { Attack: 'atk', Power: 'pow' }[c.type] || 'skl';
-  return `<div class="gcard ${shape}" style="--cc:${cardColor(c)}">
-    <div class="gc-top">${costHtml(c, up)}<div class="gc-name nm${up && c.up ? ' upg' : ''}">${esc(c.name)}${up && c.up ? '+' : ''}</div></div>
-    <div class="gc-art">${imgTag(art, '', c.name)}</div>
-    <div class="gc-type"><span class="r-${esc(c.rarity)}">●</span> ${esc(c.type || '')}</div>
-    <div class="gc-text"><div>${text || "&nbsp;"}</div></div>
-  </div>`;
+  up = up && !!(c.up || c.udesc);
+  const type = c.type || 'Skill';
+  const ft = ['Attack', 'Power', 'Quest'].includes(type) ? type.toLowerCase() : 'skill';
+  const bt = ft === 'quest' ? 'skill' : ft;
+  const fc = CHARS6.includes(c.color) ? c.color : ['curse', 'quest'].includes(c.color) ? c.color : 'colorless';
+  const rl = String(c.rarity || '').toLowerCase();
+  const rarity = ['uncommon', 'rare', 'curse', 'status', 'event', 'quest', 'ancient'].includes(rl) ? rl : 'common';
+  const energy = energyOf(c);
+  const art = c.img;  // c.bimg is the game's optional placeholder "beta art", not the beta branch
+  // body: keyword lines (as the game prints them) around the description
+  const kw = cardKeywords(c, up);
+  const desc = up ? (upText(c) || c.desc) : c.desc;
+  const before = KW_BEFORE.filter(k => kw.has(k)).map(k => `[gold]${k}[/gold].`);
+  const after = KW_AFTER.filter(k => kw.has(k)).map(k => `[gold]${k}[/gold].`);
+  const body = [...before, desc, ...after].filter(Boolean).join('\n');
+  const baseBody = up ? [...KW_BEFORE.filter(k => cardKeywords(c, false).has(k)).map(k => `[gold]${k}[/gold].`), c.desc, ...KW_AFTER.filter(k => cardKeywords(c, false).has(k)).map(k => `[gold]${k}[/gold].`)].filter(Boolean).join('\n') : null;
+  // cost
+  let cost = c.cost, costUp = false;
+  if (up && c.up && c.up.cost != null) { const v = String(c.up.cost); cost = /^[+-]/.test(v) ? c.cost + Number(v) : Number(v); costUp = true; }
+  const showOrb = c.x || (cost != null && cost >= 0);
+  const eb = ENERGY_BOX[energy] || [74, 74, 0, 0, 74, 74], es = 64 / Math.max(eb[0], eb[1]);
+  const eL = -166 + (64 - eb[0] * es) / 2 + eb[2] * es, eT = -227 + (64 - eb[1] * es) / 2 + eb[3] * es;
+  const bs = 327 / 655, bTop = -207 + (83 - 170 * bs) / 2;
+  const hasStar = c.xstar || (c.star != null && c.star >= 0);
+  const title = c.name + (up ? '+' : '');
+  return `<div class="gcard-wrap"><div class="gcard">
+    <img class="gl" src="${FR('frame_attack_colorless')}" style="${bx(-138, -199, 299, 422)};filter:brightness(0);opacity:.251" alt="">
+    ${art ? `<img class="gl" src="${esc(art)}" style="${bx(-125, -168, 250, 190)};object-fit:contain" alt="">` : ''}
+    <img class="gl" src="${FR(`frame_${ft}_${fc}`)}" style="${bx(-150, -211, ft === 'quest' ? 299.5 : 299, 422)}" alt="">
+    <div class="gc-desc" style="${bx(-122, 37, 243, 136)}"><div class="gc-desc-in">${cardText(body, energy, baseBody)}</div></div>
+    <img class="gl" src="${FR(`border_${bt}_${rarity}`)}" style="${bx(-137.5, -164, 275, 210)}" alt="">
+    <img class="gl" src="${FR(`banner_${rarity}`)}" style="${bx(-163 + bs, bTop + 23 * bs, 653 * bs, 145 * bs)}" alt="">
+    ${svgText(title, 0, kreonBase(-204, 54, 26) + 0.5, 26, 400, up ? GAME_COLORS.green : '#fff6e2', up ? '#1b6131' : (TITLE_OUTLINE[rarity] || '#4d4b40'), 3, 210)}
+    <div class="gc-plaque" style="${bx(-30, 1, 61, 37)};border-image-source:url(${FR(`plaque_${rarity}`)})"><span>${esc(type)}</span></div>
+    ${showOrb ? `<img class="gl" src="${FR(`energy_${energy}`)}" style="${bx(eL, eT, eb[4] * es, eb[5] * es)}" alt="">
+      ${svgText(c.x ? 'X' : String(cost), -134, kreonBase(-221, 56, 35) - 0.5, 35, 700, costUp ? GAME_COLORS.green : '#fff6e2', costUp ? '#1f5923' : (ENERGY_OUTLINE[energy] || '#4c4943'), 3.5)}` : ''}
+    ${hasStar ? `<img class="gl" src="https://cdn.spire-codex.com/card-render/energy_star.png" style="${bx(-186, -189, 58, 58)}" alt="">
+      ${svgText(c.xstar ? 'X' : String(c.star), -157, kreonBase(-180, 40, 23.5) - 2.5, 23.5, 700, '#fff6e2', 'rgba(23,85,97,0.863)', 2.75)}` : ''}
+  </div></div>`;
 }
+/* After inserting a card: scale the 300×422 canvas to the wrapper, shrink the title to fit,
+   size the type plaque, and shrink the description font until it fits its box (like the game). */
+function fitCards(root = document) {
+  root.querySelectorAll('.gcard-wrap').forEach(w => {
+    const g = w.querySelector('.gcard');
+    const fit = () => {
+      g.style.transform = `scale(${w.clientWidth / CW})`;
+      w.style.height = (w.clientWidth * CH / CW) + 'px';
+      w.querySelectorAll('text[data-fit]').forEach(t => {
+        const max = +t.dataset.fit, nodes = t.closest('svg').querySelectorAll('text');
+        let size = 26; nodes.forEach(n => n.setAttribute('font-size', size));
+        while (t.getComputedTextLength() > max && size > 7) { size--; nodes.forEach(n => { n.setAttribute('font-size', size); n.setAttribute('y', kreonBase(-204, 54, size) + 0.5 + CY); }); }
+      });
+      const pl = w.querySelector('.gc-plaque'), sp = pl?.querySelector('span');
+      if (pl && sp) { const pw = Math.max(sp.offsetWidth + 17, 61); pl.style.width = pw + 'px'; pl.style.left = (CX + Math.round(-pw / 2)) + 'px'; }
+      const box = w.querySelector('.gc-desc'), inner = w.querySelector('.gc-desc-in');
+      let fs = 21; inner.style.fontSize = fs + 'px';
+      while (inner.scrollHeight > box.clientHeight && fs > 12) { fs -= 0.5; inner.style.fontSize = fs + 'px'; }
+    };
+    fit();
+    document.fonts?.ready.then(fit);
+  });
+}
+window.addEventListener('resize', () => fitCards());
 function costHtml(c, up) {
+  const en = energyOf(c);
+  const orb = cls => `<div class="cost orb ${cls}" style="background-image:url(https://cdn.spire-codex.com/card-frames/energy_${en}.webp);--eo:${ENERGY_OUTLINE[en] || '#4c4943'}">`;
   let cost = c.cost, changed = false;
   if (up && c.up && c.up.cost != null) {
     const v = String(c.up.cost);
     cost = /^[+-]/.test(v) ? c.cost + Number(v) : Number(v); changed = true;
   }
-  if (c.x) return `<div class="cost">X</div>`;
-  if (c.star != null && (cost == null || cost < 0)) return `<div class="cost">${c.star}★</div>`;
-  if (cost == null || cost < 0) return `<div class="cost none">–</div>`;
-  return `<div class="cost ${changed ? 'changed' : ''}">${cost}</div>`;
+  if (c.x) return orb('') + 'X</div>';
+  if (c.star != null && (cost == null || cost < 0)) return `<div class="cost orb star" style="background-image:url(https://cdn.spire-codex.com/card-render/energy_star.png)">${c.star}</div>`;
+  if (cost == null || cost < 0) return `<div class="cost none"></div>`;
+  return orb(changed ? 'changed' : '') + cost + '</div>';
 }
 function upText(c) { return c.udesc || (c.up ? c.desc : null); }
 function upExtras(c) {
@@ -556,7 +652,7 @@ V.cards = () => {
       if (!list.length) return '<div class="empty">No cards match.</div>';
       return `<div class="count">${list.length} cards</div><div class="list">${list.slice(0, 400).map(c => {
         const t = up ? (upText(c) || c.desc) : c.desc;
-        return `<a class="item cardrow" style="--cc:${cardColor(c)}" href="#/card/${c.id}">${costHtml(c, up)}<div class="body"><div class="title"><span class="nm">${esc(c.name)}</span>${up && c.up ? '<span class="t-up">+</span>' : ''} <span class="ctype"><span class="r-${esc(c.rarity)}">${esc(c.rarity || '')}</span> ${esc(c.type || '')}${col === 'all' ? ' · ' + esc(colorName(c.color)) : ''}</span></div><div class="desc">${fmt(t)}</div></div></a>`;
+        return `<a class="item cardrow" style="--cc:${cardColor(c)}" href="#/card/${c.id}">${costHtml(c, up)}<div class="body"><div class="title"><span class="nm">${esc(c.name)}</span>${up && c.up ? '<span class="t-up">+</span>' : ''} <span class="ctype"><span class="r-${esc(c.rarity)}">${esc(c.rarity || '')}</span> ${esc(c.type || '')}${col === 'all' ? ' · ' + esc(colorName(c.color)) : ''}</span></div><div class="desc">${fmt(t, energyOf(c))}</div></div></a>`;
       }).join('')}</div>${list.length > 400 ? '<div class="note">Showing first 400. Narrow the filters to see more.</div>' : ''}`;
     });
     wireChips(view, page); wireSearch(view, 'cq', draw, q => rank(D.cards, q, c => c.name).map(c => ({ label: c.name, sub: `${c.rarity || ''} ${c.type || ''} · ${colorName(c.color)}`, href: '#/card/' + c.id })));
@@ -577,13 +673,15 @@ V.card = (id) => {
     ${canUp ? `<div style="text-align:center;margin:10px 0 2px"><div class="seg" id="upSeg"><button data-u="0" class="${up ? '' : 'on'}">Base</button><button data-u="1" class="${up ? 'on' : ''}">Upgraded</button></div></div>` : '<div class="note" style="text-align:center">Can’t be upgraded</div>'}
     <div id="gcWrap">${gameCard(c, up)}</div>
     <div id="upNote" class="note" style="text-align:center">${up && ex.length ? ex.map(esc).join(' · ') : ''}</div>
-    ${(c.kw || []).length ? `<h2>Keywords</h2><div class="panel">${c.kw.map(k => { const kk = (D.keywords || []).find(x => norm(x.name || x.id) === norm(k)); return `<div><b>${esc(k)}</b>${kk?.description ? ' <span class="sub">' + fmt(kk.description) + '</span>' : ''}</div>`; }).join('')}</div>` : ''}
+    ${(c.kw || []).length ? `<h2>Keywords</h2><div class="panel">${c.kw.map(k => { const kk = (D.keywords || []).find(x => norm(x.name || x.id) === norm(k)); return `<div style="margin:3px 0"><b class="nm" style="color:#efc851">${esc(k)}</b>${kk?.description ? ' <span class="gtext">' + fmt(kk.description) + '</span>' : ''}</div>`; }).join('')}</div>` : ''}
     ${evs.length ? `<h2>From events</h2>${evs.map(evRow).join('')}` : ''}`;
+  fitCards($('#gcWrap'));
   $('#upSeg')?.addEventListener('click', e => {
     const b = e.target.closest('button'); if (!b) return;
     const u = b.dataset.u === '1'; setUi('cdup', u);
     $('#upSeg').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
     $('#gcWrap').innerHTML = gameCard(c, u);
+    fitCards($('#gcWrap'));
     $('#upNote').innerHTML = u && ex.length ? ex.map(esc).join(' · ') : '';
   });
 };
@@ -600,7 +698,7 @@ V.relics = () => {
       ${chips('rpool', [['all', 'Any pool'], ...pools.map(p => [p, p === 'shared' ? 'Shared' : colorName(p)])], ui('rpool', 'all'))}`, () => {
       const q = norm(ui('rq', '')), ra = ui('rrar', 'all'), po = ui('rpool', 'all');
       const list = D.relics.filter(r => (ra === 'all' || r.rarity === ra) && (po === 'all' || r.pool === po) && (!q || norm(r.name).includes(q) || norm(strip(r.desc)).includes(q)))
-        .sort((a, b) => (rar.indexOf(a.rarity) - rar.indexOf(b.rarity)) || a.name.localeCompare(b.name));
+        .sort((a, b) => (((rar.indexOf(a.rarity) + 99) % 99) - ((rar.indexOf(b.rarity) + 99) % 99)) || a.name.localeCompare(b.name));
       if (!list.length) return '<div class="empty">No relics match.</div>';
       return `<div class="count">${list.length} relics</div><div class="list">${list.map(r => `<a class="item" href="#/relic/${r.id}">${imgTag(r.img, 'ico', r.name)}<div class="body"><div class="title"><span class="nm">${esc(r.name)}</span> <span class="ctype r-${esc(r.rarity)}">${esc(r.rarity)}</span>${r.pool && r.pool !== 'shared' ? ` <span class="ctype">· ${esc(colorName(r.pool))}</span>` : ''}</div><div class="desc">${fmt(r.desc)}</div>${relicSource(r, true)}</div></a>`).join('')}</div>`;
     });
@@ -623,7 +721,7 @@ V.relic = (id) => {
   const evs = (r.events || []).map(e => D.EV[e]).filter(Boolean);
   $('#view').innerHTML = backBtn() + `
     <div class="hero"><div class="art">${imgTag(r.img, '', r.name)}</div><div><h1>${esc(r.name)}</h1><div class="sub"><span class="r-${esc(r.rarity)}">${esc(r.rarity)}</span> relic · ${esc(r.pool === 'shared' ? 'Shared' : colorName(r.pool))}</div></div></div>
-    <h2>Effect</h2><div class="panel">${fmt(r.desc)}</div>
+    <h2>Effect</h2><div class="panel gtext">${fmt(r.desc)}</div>
     ${r.flavor && !/revealed in the future/.test(r.flavor) ? `<div class="note"><i>${fmt(r.flavor)}</i></div>` : ''}
     ${r.notes ? `<div class="note">${fmt(typeof r.notes === 'string' ? r.notes : JSON.stringify(r.notes))}</div>` : ''}
     ${relicSource(r)}
@@ -657,7 +755,7 @@ V.event = (id) => {
   const relics = D.relics.filter(r => (r.events || []).includes(id));
   const cards = D.cards.filter(c => (c.events || []).includes(id));
   $('#view').innerHTML = backBtn() + `<h1>${esc(e.name)}</h1><div>${(e.acts || []).map(actBadge).join(' ') || '<span class="badge">Any act</span>'} ${e.type && e.type !== 'Event' ? `<span class="badge">${esc(e.type)}</span>` : ''}</div>
-    ${e.desc ? `<div class="panel" style="margin-top:12px">${fmt(e.desc)}</div>` : ''}
+    ${e.desc ? `<div class="panel gtext" style="margin-top:12px">${fmt(e.desc)}</div>` : ''}
     ${e.pre ? `<div class="note">Requires: ${fmt(typeof e.pre === 'string' ? e.pre : JSON.stringify(e.pre))}</div>` : ''}
     ${(e.options || []).length ? `<h2>Options</h2>${e.options.map(opt).join('')}` : ''}
     ${(e.pages || []).filter(p => (p.options || []).length).map(p => `<h2>${esc(title(p.id))}</h2>${p.desc ? `<div class="note">${fmt(p.desc)}</div>` : ''}${p.options.map(opt).join('')}`).join('')}
@@ -708,7 +806,7 @@ V.characters = () => {
   const rn = id => { const r = D.R[id.replace(/([a-z])([A-Z])/g, '$1_$2').toUpperCase()] || D.relicByName[norm(id)]; return r ? `<a href="#/relic/${r.id}" class="t-gold">${esc(r.name)}</a>` : esc(id); };
   $('#view').innerHTML = backBtn() + `<h1>Characters</h1>${D.characters.map(c => {
     const deck = {}; (c.deck || []).forEach(x => { const n = cn(x); deck[n] = (deck[n] || 0) + 1; });
-    return `<div class="panel" style="margin-top:10px"><h3 class="nm">${esc(c.name)}</h3><div class="sub">${fmt(c.desc)}</div>
+    return `<div class="panel" style="margin-top:10px"><h3 class="nm">${esc(c.name)}</h3><div class="gtext">${fmt(c.desc)}</div>
       <div class="stats"><div class="stat"><b class="hp">${c.hp}</b><span>HP</span></div><div class="stat"><b>${c.gold}</b><span>Gold</span></div><div class="stat"><b>${c.energy}</b><span>Energy</span></div>${c.orbs ? `<div class="stat"><b>${c.orbs}</b><span>Orb slots</span></div>` : ''}</div>
       <div class="note">Starting relic: ${(c.relics || []).map(rn).join(', ')}</div>
       <div class="note">Deck: ${Object.entries(deck).map(([n, k]) => `${k}× ${esc(n)}`).join(', ')}</div></div>`;
@@ -737,7 +835,7 @@ V.ancient = (id) => {
   const D = S.D, a = D.AN?.[id]; if (!a) return notFound();
   const rs = (a.relics || []).map(r => D.R[r]).filter(Boolean);
   $('#view').innerHTML = backBtn() + `<h1>${esc(a.name)}</h1><div>${(a.acts || []).map(actBadge).join(' ') || '<span class="badge">Special</span>'}</div>
-    ${a.desc ? `<div class="panel" style="margin-top:12px">${fmt(a.desc)}</div>` : ''}
+    ${a.desc ? `<div class="panel gtext" style="margin-top:12px">${fmt(a.desc)}</div>` : ''}
     ${rs.length ? `<h2>Relic pool (${rs.length})</h2><div class="list">${rs.map(r => `<a class="item" href="#/relic/${r.id}">${imgTag(r.img, 'ico', r.name)}<div class="body"><div class="title"><span class="nm">${esc(r.name)}</span>${r.pool && r.pool !== 'shared' ? ` <span class="ctype">· ${esc(colorName(r.pool))}</span>` : ''}</div><div class="desc">${fmt(r.desc)}</div></div></a>`).join('')}</div>` : ''}`;
 };
 V.enchantments = () => {
@@ -785,7 +883,6 @@ V.news = async () => {
 V.more = () => {
   const D = S.D, m = S.meta?.[S.branch] || {};
   $('#view').innerHTML = `<h1>More</h1><div class="morelist" style="margin-top:12px">
-    <a href="#/news">The Neowsletter <span>${esc((S.meta?.news?.latest || '').replace(/^The Neowsletter - /, '')) || 'Latest'} ›</span></a>
     <a href="#/events">Events <span>${D.events.length} ›</span></a>
     <a href="#/ancients">Ancients <span>${(D.ancients || []).length} ›</span></a>
     <a href="#/enchantments">Enchantments <span>${(D.enchantments || []).length} ›</span></a>
@@ -793,6 +890,7 @@ V.more = () => {
     <a href="#/powers">Powers &amp; keywords <span>${D.powers.length} ›</span></a>
     <a href="#/ascension">Ascension levels <span>${ascLabel(S.asc)} ›</span></a>
     <a href="#/characters">Characters <span>${D.characters.length} ›</span></a>
+    <a href="#/news">The Neowsletter <span>${esc((S.meta?.news?.latest || '').replace(/^The Neowsletter - /, '')) || 'Latest'} ›</span></a>
     <a href="#/patch">Latest patch changes <span>v${esc(D.version)} ›</span></a>
   </div>
   <h2>Data</h2><div class="panel sub">
@@ -834,6 +932,7 @@ function route(keepScroll) {
   const top = { enemies: 'enemies', enemy: 'enemies', fights: 'fights', fight: 'fights', cards: 'cards', card: 'cards', relics: 'relics', relic: 'relics' }[name] || 'more';
   document.querySelectorAll('#tabs a').forEach(a => a.classList.toggle('on', a.dataset.t === top));
   const y = window.scrollY;
+  $('#view').dataset.p = V[name] ? name : 'enemies';
   try { (V[name] || V.enemies)(arg && decodeURIComponent(arg)); }
   catch (err) { console.error(err); $('#view').innerHTML = `<div class="empty">Something in this page’s data didn’t parse (${esc(err.message)}).</div>`; }
   window.scrollTo(0, keepScroll ? y : (scrollPos[h] || 0));
