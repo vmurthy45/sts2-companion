@@ -1,0 +1,557 @@
+{
+ "cards": {
+  "BAD_LUCK": [
+   "REFLECTIONS"
+  ],
+  "BYRDONIS_EGG": [
+   "BYRDONIS_NEST"
+  ],
+  "CALTROPS": [
+   "TRASH_HEAP"
+  ],
+  "CLASH": [
+   "TRASH_HEAP"
+  ],
+  "CLUMSY": [
+   "SHRINE_OF_THE_WARLORD",
+   "THIS_OR_THAT"
+  ],
+  "DEBT": [
+   "CRYSTAL_SPHERE"
+  ],
+  "DECAY": [
+   "GRAVE_OF_THE_FORGOTTEN",
+   "LOST_WISP"
+  ],
+  "DINGY_DAGGER": [
+   "WATERFALL_OF_OBVIOUS_SECRETS"
+  ],
+  "DISTRACTION": [
+   "TRASH_HEAP"
+  ],
+  "DOUBT": [
+   "TRIAL"
+  ],
+  "DUAL_WIELD": [
+   "TRASH_HEAP"
+  ],
+  "ENLIGHTENMENT": [
+   "ZEN_WEAVER"
+  ],
+  "ENTRENCH": [
+   "TRASH_HEAP"
+  ],
+  "EXTERMINATE": [
+   "BUGSLAYER"
+  ],
+  "FEEDING_FRENZY": [
+   "ENDLESS_CONVEYOR"
+  ],
+  "GREED": [
+   "SUNKEN_TREASURY"
+  ],
+  "GUILTY": [
+   "THERMAE_NONUPEIPE",
+   "WATERFALL_OF_OBVIOUS_SECRETS",
+   "WELLSPRING"
+  ],
+  "HELLO_WORLD": [
+   "TRASH_HEAP"
+  ],
+  "INJURY": [
+   "PUNCH_OFF",
+   "WUPPY_IN_TROUBLE"
+  ],
+  "LANTERN_KEY": [
+   "THE_LANTERN_KEY",
+   "WAR_HISTORIAN_REPY"
+  ],
+  "MAD_SCIENCE": [
+   "TINKER_TIME"
+  ],
+  "METAMORPHOSIS": [
+   "SPIRIT_GRAFTER"
+  ],
+  "MIGHTY_SHIELD": [
+   "SHRINE_OF_THE_WARLORD"
+  ],
+  "MIGHTY_WEAPON": [
+   "SHRINE_OF_THE_WARLORD"
+  ],
+  "NORMALITY": [
+   "FIELD_OF_MAN_SIZED_HOLES"
+  ],
+  "OUTMANEUVER": [
+   "TRASH_HEAP"
+  ],
+  "PECK": [
+   "WOOD_CARVINGS"
+  ],
+  "POOR_SLEEP": [
+   "UNREST_SITE"
+  ],
+  "REBOUND": [
+   "TRASH_HEAP"
+  ],
+  "REGRET": [
+   "TRIAL"
+  ],
+  "RIP_AND_TEAR": [
+   "TRASH_HEAP"
+  ],
+  "SHAME": [
+   "TRIAL"
+  ],
+  "SPOILS_MAP": [
+   "THE_LEGENDS_WERE_TRUE"
+  ],
+  "SPORE_MIND": [
+   "LUMINOUS_CHOIR"
+  ],
+  "SQUASH": [
+   "BUGSLAYER"
+  ],
+  "STACK": [
+   "TRASH_HEAP"
+  ],
+  "TORIC_TOUGHNESS": [
+   "WOOD_CARVINGS"
+  ],
+  "ULTIMATE_DEFEND": [
+   "AMALGAMATOR"
+  ],
+  "ULTIMATE_STRIKE": [
+   "AMALGAMATOR"
+  ]
+ },
+ "relics": {
+  "ALCHEMICAL_COFFER": [
+   "OROBAS"
+  ],
+  "ARCANE_SCROLL": [
+   "NEOW"
+  ],
+  "ARCHAIC_TOOTH": [
+   "OROBAS"
+  ],
+  "ASTROLABE": [
+   "DARV"
+  ],
+  "BATH_ROBES": [
+   "THERMAE_NONUPEIPE"
+  ],
+  "BATH_TOWEL": [
+   "THERMAE_NONUPEIPE"
+  ],
+  "BEAUTIFUL_BRACELET": [
+   "NONUPEIPE"
+  ],
+  "BIG_MUSHROOM": [
+   "HUNGRY_FOR_MUSHROOMS"
+  ],
+  "BIIIG_HUG": [
+   "TEZCATARA"
+  ],
+  "BING_BONG": [
+   "DOLL_ROOM"
+  ],
+  "BLACK_STAR": [
+   "DARV"
+  ],
+  "BLESSED_ANTLER": [
+   "NONUPEIPE"
+  ],
+  "BLOOD_SOAKED_ROSE": [
+   "VAKUU"
+  ],
+  "BONE_TEA": [
+   "TEA_MASTER"
+  ],
+  "BOOMING_CONCH": [
+   "NEOW"
+  ],
+  "BRILLIANT_SCARF": [
+   "NONUPEIPE"
+  ],
+  "CALLING_BELL": [
+   "DARV"
+  ],
+  "CHOICES_PARADOX": [
+   "VAKUU"
+  ],
+  "CHOSEN_CHEESE": [
+   "ROOM_FULL_OF_CHEESE"
+  ],
+  "CLAWS": [
+   "TANX"
+  ],
+  "CROSSBOW": [
+   "TANX"
+  ],
+  "CURSED_PEARL": [
+   "NEOW"
+  ],
+  "DARKSTONE_PERIAPT": [
+   "TRASH_HEAP"
+  ],
+  "DAUGHTER_OF_THE_WIND": [
+   "DOLL_ROOM"
+  ],
+  "DELICATE_FROND": [
+   "NONUPEIPE"
+  ],
+  "DIAMOND_DIADEM": [
+   "NONUPEIPE"
+  ],
+  "DISTINGUISHED_CAPE": [
+   "VAKUU"
+  ],
+  "DOWSING_ROD": [
+   "NEOW"
+  ],
+  "DREAM_CATCHER": [
+   "TRASH_HEAP"
+  ],
+  "DRIFTWOOD": [
+   "OROBAS"
+  ],
+  "DUSTY_TOME": [
+   "DARV"
+  ],
+  "ECTOPLASM": [
+   "DARV"
+  ],
+  "ELECTRIC_SHRYMP": [
+   "OROBAS"
+  ],
+  "EMBER_TEA": [
+   "TEA_MASTER"
+  ],
+  "EMPTY_CAGE": [
+   "DARV"
+  ],
+  "FAKE_ANCHOR": [
+   "FAKE_MERCHANT"
+  ],
+  "FAKE_BLOOD_VIAL": [
+   "FAKE_MERCHANT"
+  ],
+  "FAKE_HAPPY_FLOWER": [
+   "FAKE_MERCHANT"
+  ],
+  "FAKE_LEES_WAFFLE": [
+   "FAKE_MERCHANT"
+  ],
+  "FAKE_MANGO": [
+   "FAKE_MERCHANT"
+  ],
+  "FAKE_MERCHANTS_RUG": [
+   "FAKE_MERCHANT"
+  ],
+  "FAKE_ORICHALCUM": [
+   "FAKE_MERCHANT"
+  ],
+  "FAKE_SNECKO_EYE": [
+   "FAKE_MERCHANT"
+  ],
+  "FAKE_STRIKE_DUMMY": [
+   "FAKE_MERCHANT"
+  ],
+  "FAKE_VENERABLE_TEA_SET": [
+   "FAKE_MERCHANT"
+  ],
+  "FIDDLE": [
+   "VAKUU"
+  ],
+  "FISHING_ROD": [
+   "NEOW"
+  ],
+  "FORGOTTEN_SOUL": [
+   "GRAVE_OF_THE_FORGOTTEN"
+  ],
+  "FRAGRANT_MUSHROOM": [
+   "HUNGRY_FOR_MUSHROOMS"
+  ],
+  "FRESNEL_LENS": [
+   "DROWNING_BEACON"
+  ],
+  "FUR_COAT": [
+   "NONUPEIPE"
+  ],
+  "GLASS_EYE": [
+   "OROBAS"
+  ],
+  "GLITTER": [
+   "NONUPEIPE"
+  ],
+  "GOLDEN_COMPASS": [
+   "TEZCATARA"
+  ],
+  "GOLDEN_PEARL": [
+   "NEOW"
+  ],
+  "HAND_DRILL": [
+   "TRASH_HEAP"
+  ],
+  "HEFTY_TABLET": [
+   "NEOW"
+  ],
+  "HISTORY_COURSE": [
+   "WAR_HISTORIAN_REPY"
+  ],
+  "IRON_CLUB": [
+   "TANX"
+  ],
+  "JEWELED_MASK": [
+   "VAKUU"
+  ],
+  "JEWELRY_BOX": [
+   "NONUPEIPE"
+  ],
+  "KALEIDOSCOPE": [
+   "NEOW"
+  ],
+  "LARGE_CAPSULE": [
+   "NEOW"
+  ],
+  "LAVA_ROCK": [
+   "NEOW"
+  ],
+  "LEAD_PAPERWEIGHT": [
+   "NEOW"
+  ],
+  "LEAFY_POULTICE": [
+   "NEOW"
+  ],
+  "LOOMING_FRUIT": [
+   "NONUPEIPE",
+   "THERMAE_NONUPEIPE"
+  ],
+  "LORDS_PARASOL": [
+   "VAKUU"
+  ],
+  "LOST_COFFER": [
+   "NEOW"
+  ],
+  "LOST_WISP": [
+   "LOST_WISP"
+  ],
+  "MASSIVE_SCROLL": [
+   "NEOW"
+  ],
+  "MAW_BANK": [
+   "TRASH_HEAP"
+  ],
+  "MEAT_CLEAVER": [
+   "TANX"
+  ],
+  "MIGHTY_WINGS": [
+   "SHRINE_OF_THE_WARLORD"
+  ],
+  "MR_STRUGGLES": [
+   "DOLL_ROOM"
+  ],
+  "MUSIC_BOX": [
+   "VAKUU"
+  ],
+  "NEOWS_BONES": [
+   "NEOW"
+  ],
+  "NEOWS_SACRIFICE": [
+   "NEOW"
+  ],
+  "NEOWS_TALISMAN": [
+   "NEOW"
+  ],
+  "NEOWS_TORMENT": [
+   "NEOW"
+  ],
+  "NEW_LEAF": [
+   "NEOW"
+  ],
+  "NUTRITIOUS_OYSTER": [
+   "NEOW"
+  ],
+  "NUTRITIOUS_SOUP": [
+   "TEZCATARA"
+  ],
+  "OBSIDIAN_VICE": [
+   "MUSEUM_OF_TORTURE"
+  ],
+  "PAELS_BLOOD": [
+   "PAEL"
+  ],
+  "PAELS_CLAW": [
+   "PAEL"
+  ],
+  "PAELS_EYE": [
+   "PAEL"
+  ],
+  "PAELS_FLESH": [
+   "PAEL"
+  ],
+  "PAELS_GROWTH": [
+   "PAEL"
+  ],
+  "PAELS_HORN": [
+   "PAEL"
+  ],
+  "PAELS_LEGION": [
+   "PAEL"
+  ],
+  "PAELS_TEARS": [
+   "PAEL"
+  ],
+  "PAELS_TOOTH": [
+   "PAEL"
+  ],
+  "PAELS_WING": [
+   "PAEL"
+  ],
+  "PANDORAS_BOX": [
+   "DARV"
+  ],
+  "PHIAL_HOLSTER": [
+   "NEOW"
+  ],
+  "PHILOSOPHERS_STONE": [
+   "DARV"
+  ],
+  "POLLINOUS_CORE": [
+   "COLOSSAL_FLOWER"
+  ],
+  "POMANDER": [
+   "NEOW"
+  ],
+  "PRECARIOUS_SHEARS": [
+   "NEOW"
+  ],
+  "PRECISE_SCISSORS": [
+   "NEOW"
+  ],
+  "PRESERVED_FOG": [
+   "VAKUU"
+  ],
+  "PRISMATIC_GEM": [
+   "OROBAS"
+  ],
+  "PUMPKIN_CANDLE": [
+   "TEZCATARA"
+  ],
+  "RADIANT_PEARL": [
+   "OROBAS"
+  ],
+  "ROYAL_POISON": [
+   "ROUND_TEA_PARTY"
+  ],
+  "RUNIC_PYRAMID": [
+   "DARV"
+  ],
+  "SAI": [
+   "TANX"
+  ],
+  "SAND_CASTLE": [
+   "OROBAS"
+  ],
+  "SCROLL_BOXES": [
+   "NEOW"
+  ],
+  "SEAL_OF_GOLD": [
+   "TEZCATARA"
+  ],
+  "SEA_GLASS": [
+   "OROBAS"
+  ],
+  "SERE_TALON": [
+   "VAKUU"
+  ],
+  "SIGNET_RING": [
+   "NONUPEIPE"
+  ],
+  "SILKEN_TRESS": [
+   "NEOW"
+  ],
+  "SILVER_CRUCIBLE": [
+   "NEOW"
+  ],
+  "SMALL_CAPSULE": [
+   "NEOW"
+  ],
+  "SNECKO_EYE": [
+   "DARV"
+  ],
+  "SOZU": [
+   "DARV"
+  ],
+  "SPIKED_GAUNTLETS": [
+   "TANX"
+  ],
+  "STONE_HUMIDIFIER": [
+   "NEOW"
+  ],
+  "STORYBOOK": [
+   "TEZCATARA"
+  ],
+  "SWORD_OF_STONE": [
+   "SUNKEN_STATUE"
+  ],
+  "TANXS_WHISTLE": [
+   "TANX"
+  ],
+  "TEA_OF_DISCOURTESY": [
+   "TEA_MASTER"
+  ],
+  "THE_BOOT": [
+   "TRASH_HEAP"
+  ],
+  "THROWING_AXE": [
+   "TANX"
+  ],
+  "THUMBSCREW": [
+   "MUSEUM_OF_TORTURE"
+  ],
+  "TOASTY_MITTENS": [
+   "TEZCATARA"
+  ],
+  "TORMENTOUS_COLLAR": [
+   "MUSEUM_OF_TORTURE"
+  ],
+  "TOUCH_OF_OROBAS": [
+   "OROBAS"
+  ],
+  "TOY_BOX": [
+   "TEZCATARA"
+  ],
+  "TRI_BOOMERANG": [
+   "TANX"
+  ],
+  "VELVET_CHOKER": [
+   "DARV"
+  ],
+  "VERY_HOT_COCOA": [
+   "TEZCATARA"
+  ],
+  "WAR_HAMMER": [
+   "TANX"
+  ],
+  "WHISPERING_EARRING": [
+   "VAKUU"
+  ],
+  "WINGED_BOOTS": [
+   "NEOW"
+  ],
+  "WONGOS_MYSTERY_TICKET": [
+   "WELCOME_TO_WONGOS"
+  ],
+  "WONGO_CUSTOMER_APPRECIATION_BADGE": [
+   "WELCOME_TO_WONGOS"
+  ],
+  "WUPPY": [
+   "WUPPY_IN_TROUBLE"
+  ],
+  "YUMMY_COOKIE": [
+   "TEZCATARA"
+  ]
+ },
+ "source": "data_sts2_macos_x86_64"
+}
