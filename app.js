@@ -357,8 +357,8 @@ V.enemies = () => {
   const page = () => {
     const { view, draw } = listPage(() => `
       ${searchBox('eq', 'Search enemies or moves')}
-      ${chips('eact', [['all', 'All acts'], ...acts.map(a => [a, a])], ui('eact', 'all'))}
-      ${chips('etype', [['all', 'All'], ['Normal', 'Normal'], ['Elite', 'Elite'], ['Boss', 'Boss']], ui('etype', 'all'))}`, () => {
+      <div class="frow">${fsel('eact', [['all', 'Act'], ...acts.map(a => [a, a])])}
+      ${fsel('etype', [['all', 'Type'], ['Normal', 'Normal'], ['Elite', 'Elite'], ['Boss', 'Boss']])}</div>`, () => {
       const q = norm(ui('eq', '')), act = ui('eact', 'all'), ty = ui('etype', 'all');
       let list = D.monsters.filter(m =>
         (act === 'all' || m.acts.includes(act) || (act === 'Other' && !m.acts.length)) &&
@@ -371,7 +371,7 @@ V.enemies = () => {
         return `<a class="tile" href="#/enemy/${m.id}"><div class="pic">${imgTag(m.img, '', m.name)}</div><div class="meta"><div class="name">${esc(m.name)}</div><div class="hp">❤ ${range(h.lo, h.hi)} · ${typeBadge(m.type)}</div><div class="hp">${m.acts.map(esc).join(', ') || 'Other'}</div></div></a>`;
       }).join('')}</div>`;
     });
-    wireChips(view, page); wireSearch(view, 'eq', draw, q => rank(D.monsters, q, m => m.name).map(sgEnemy)); draw();
+    wireSelects(view, draw); wireSearch(view, 'eq', draw, q => rank(D.monsters, q, m => m.name).map(sgEnemy)); draw();
   };
   page();
 };
@@ -481,8 +481,8 @@ V.fights = () => {
   const page = () => {
     const { view, draw } = listPage(() => `
       ${searchBox('fq', 'Search fights or enemies')}
-      ${chips('fact', [['all', 'All acts'], ...acts.map(a => [a, a])], ui('fact', 'all'))}
-      ${chips('froom', [['all', 'All'], ['Weak', 'Weak'], ['Normal', 'Normal'], ['Elite', 'Elite'], ['Boss', 'Boss']], ui('froom', 'all'))}`, () => {
+      <div class="frow">${fsel('fact', [['all', 'Act'], ...acts.map(a => [a, a])])}
+      ${fsel('froom', [['all', 'Room'], ['Weak', 'Weak'], ['Normal', 'Normal'], ['Elite', 'Elite'], ['Boss', 'Boss']])}</div>`, () => {
       const q = norm(ui('fq', '')), act = ui('fact', 'all'), room = ui('froom', 'all');
       const lab = e => e.weak ? 'Weak' : (e.room === 'Monster' ? 'Normal' : e.room);
       const list = D.encounters.filter(e => (act === 'all' || e.act === act) && (room === 'all' || lab(e) === room) &&
@@ -499,7 +499,7 @@ V.fights = () => {
       }
       return h;
     });
-    wireChips(view, page); wireSearch(view, 'fq', draw, q => [...rank(D.encounters, q, e => e.name).map(e => ({ label: e.name, sub: `${e.weak ? 'Weak' : e.room === 'Monster' ? 'Normal' : e.room} · ${e.act}`, href: '#/fight/' + e.id })), ...rank(D.monsters, q, m => m.name).map(sgEnemy)]); draw();
+    wireSelects(view, draw); wireSearch(view, 'fq', draw, q => [...rank(D.encounters, q, e => e.name).map(e => ({ label: e.name, sub: `${e.weak ? 'Weak' : e.room === 'Monster' ? 'Normal' : e.room} · ${e.act}`, href: '#/fight/' + e.id })), ...rank(D.monsters, q, m => m.name).map(sgEnemy)]); draw();
   };
   page();
 };
@@ -701,7 +701,7 @@ V.cards = () => {
         return `<a class="item cardrow" style="--cc:${cardColor(c)}" href="#/card/${c.id}">${costHtml(c, up)}<div class="body"><div class="title"><span class="nm">${esc(c.name)}</span>${up && c.up ? '<span class="t-up">+</span>' : ''} <span class="ctype"><span class="r-${esc(c.rarity)}">${esc(c.rarity || '')}</span> ${esc(c.type || '')}${col === 'all' ? ' · ' + esc(colorName(c.color)) : ''}</span></div><div class="desc">${fmt(t, energyOf(c))}</div></div></a>`;
       }).join('')}</div>${list.length > 400 ? '<div class="note">Showing first 400. Narrow the filters to see more.</div>' : ''}`;
     });
-    wireChips(view, page); wireSearch(view, 'cq', draw, q => rank(D.cards, q, c => c.name).map(c => ({ label: c.name, sub: `${c.rarity || ''} ${c.type || ''} · ${colorName(c.color)}`, href: '#/card/' + c.id })));
+    wireSearch(view, 'cq', draw, q => rank(D.cards, q, c => c.name).map(c => ({ label: c.name, sub: `${c.rarity || ''} ${c.type || ''} · ${colorName(c.color)}`, href: '#/card/' + c.id })));
     $('#upT').addEventListener('click', e => { const on = !ui('cup', false); setUi('cup', on); e.currentTarget.classList.toggle('on', on); e.currentTarget.setAttribute('aria-pressed', on); draw(); });
     wireSelects(view, draw);
     draw();
@@ -741,15 +741,15 @@ V.relics = () => {
   const page = () => {
     const { view, draw } = listPage(() => `
       ${searchBox('rq', 'Search relics or text')}
-      ${chips('rrar', [['all', 'Any rarity'], ...rar.map(r => [r, r])], ui('rrar', 'all'))}
-      ${chips('rpool', [['all', 'Any pool'], ...pools.map(p => [p, p === 'shared' ? 'Shared' : colorName(p)])], ui('rpool', 'all'))}`, () => {
+      <div class="frow">${fsel('rrar', [['all', 'Rarity'], ...rar.map(r => [r, r])])}
+      ${fsel('rpool', [['all', 'Pool'], ...pools.map(p => [p, p === 'shared' ? 'Shared' : colorName(p)])])}</div>`, () => {
       const q = norm(ui('rq', '')), ra = ui('rrar', 'all'), po = ui('rpool', 'all');
       const list = D.relics.filter(r => (ra === 'all' || r.rarity === ra) && (po === 'all' || r.pool === po) && (!q || norm(r.name).includes(q) || norm(strip(r.desc)).includes(q)))
         .sort((a, b) => (((rar.indexOf(a.rarity) + 99) % 99) - ((rar.indexOf(b.rarity) + 99) % 99)) || a.name.localeCompare(b.name));
       if (!list.length) return '<div class="empty">No relics match.</div>';
       return `<div class="count">${list.length} relics</div><div class="list">${list.map(r => `<a class="item" href="#/relic/${r.id}">${imgTag(r.img, 'ico', r.name)}<div class="body"><div class="title"><span class="nm">${esc(r.name)}</span> <span class="ctype r-${esc(r.rarity)}">${esc(r.rarity)}</span>${r.pool && r.pool !== 'shared' ? ` <span class="ctype">· ${esc(colorName(r.pool))}</span>` : ''}</div><div class="desc">${fmt(r.desc)}</div>${relicSource(r, true)}</div></a>`).join('')}</div>`;
     });
-    wireChips(view, page); wireSearch(view, 'rq', draw, q => rank(D.relics, q, r => r.name).map(r => ({ label: r.name, sub: `${r.rarity}${r.pool && r.pool !== 'shared' ? ' · ' + colorName(r.pool) : ''}`, href: '#/relic/' + r.id, img: r.img }))); draw();
+    wireSelects(view, draw); wireSearch(view, 'rq', draw, q => rank(D.relics, q, r => r.name).map(r => ({ label: r.name, sub: `${r.rarity}${r.pool && r.pool !== 'shared' ? ' · ' + colorName(r.pool) : ''}`, href: '#/relic/' + r.id, img: r.img }))); draw();
   };
   page();
 };
@@ -786,13 +786,13 @@ V.events = () => {
     const { view, draw } = listPage(() => `
       <h1>Events</h1>
       ${searchBox('vq', 'Search events')}
-      ${chips('vact', [['all', 'All'], ...acts.map(a => [a, a]), ['none', 'Shared / other']], ui('vact', 'all'))}`, () => {
+      <div class="frow">${fsel('vact', [['all', 'Act'], ...acts.map(a => [a, a]), ['none', 'Shared / other']])}</div>`, () => {
       const q = norm(ui('vq', '')), act = ui('vact', 'all');
       const list = D.events.filter(e => (act === 'all' || (act === 'none' ? !(e.acts || []).length : (e.acts || []).includes(act))) && (!q || norm(e.name).includes(q) || norm(strip(JSON.stringify(e.options || ''))).includes(q)))
         .sort((a, b) => a.name.localeCompare(b.name));
       return `<div class="count">${list.length} events</div><div class="list">${list.map(evRow).join('')}</div>`;
     });
-    wireChips(view, page); wireSearch(view, 'vq', draw, q => rank(D.events, q, e => e.name).map(e => ({ label: e.name, sub: (e.acts || []).join(' / ') || 'Any act', href: '#/event/' + e.id }))); draw();
+    wireSelects(view, draw); wireSearch(view, 'vq', draw, q => rank(D.events, q, e => e.name).map(e => ({ label: e.name, sub: (e.acts || []).join(' / ') || 'Any act', href: '#/event/' + e.id }))); draw();
   };
   page();
 };
@@ -828,13 +828,13 @@ V.powers = () => {
   const D = S.D;
   const page = () => {
     const { view, draw } = listPage(() => `<h1>Powers &amp; keywords</h1>${searchBox('wq', 'Search buffs, debuffs, keywords')}
-      ${chips('wtype', [['all', 'All'], ['Buff', 'Buffs'], ['Debuff', 'Debuffs'], ['kw', 'Card keywords']], ui('wtype', 'all'))}`, () => {
+      <div class="frow">${fsel('wtype', [['all', 'Kind'], ['Buff', 'Buffs'], ['Debuff', 'Debuffs'], ['kw', 'Card keywords']])}</div>`, () => {
       const q = norm(ui('wq', '')), ty = ui('wtype', 'all');
       if (ty === 'kw') return `<div class="list">${(D.keywords || []).map(k => `<div class="item"><div class="body"><div class="title"><span class="nm">${esc(k.name || k.id)}</span></div><div class="desc">${fmt(k.description || '')}</div></div></div>`).join('')}</div>`;
       const list = D.powers.filter(p => (ty === 'all' || p.type === ty) && (!q || norm(p.name).includes(q) || norm(strip(p.desc)).includes(q))).sort((a, b) => a.name.localeCompare(b.name));
       return `<div class="count">${list.length} powers</div><div class="list">${list.map(p => `<div class="item">${imgTag(p.img, 'ico')}<div class="body"><div class="title"><span class="nm">${esc(p.name)}</span> <span class="ctype">${esc(p.type || '')}</span></div><div class="desc">${fmt(p.desc)}</div></div></div>`).join('')}</div>`;
     });
-    wireChips(view, page); wireSearch(view, 'wq', draw, q => [...rank(D.powers, q, p => p.name).map(p => ({ label: p.name, sub: p.type, img: p.img })), ...rank(D.keywords || [], q, k => k.name || k.id).map(k => ({ label: k.name || k.id, sub: 'Card keyword' }))]); draw();
+    wireSelects(view, draw); wireSearch(view, 'wq', draw, q => [...rank(D.powers, q, p => p.name).map(p => ({ label: p.name, sub: p.type, img: p.img })), ...rank(D.keywords || [], q, k => k.name || k.id).map(k => ({ label: k.name || k.id, sub: 'Card keyword' }))]); draw();
   };
   page();
 };

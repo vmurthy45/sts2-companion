@@ -364,3 +364,4 @@ h1 { font-size: 25px; }
 .fsel.on::after { color: var(--bg); }
 .fbtn { flex: none; border: 1px solid var(--line); background: var(--card); color: var(--muted); border-radius: 999px; padding: 0 12px; font-size: 13px; font-weight: 600; cursor: pointer; }
 .fbtn.on { background: #1f5923; border-color: #7fff00; color: #7fff00; }
+.fsel:only-child { flex: 0 1 50%; }
