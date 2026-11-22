@@ -344,7 +344,7 @@ h1 { font-size: 25px; }
   text-shadow: -1.5px -1.5px 0 var(--eo), 1.5px -1.5px 0 var(--eo), -1.5px 1.5px 0 var(--eo), 1.5px 1.5px 0 var(--eo), 0 1.5px 0 var(--eo), 0 -1.5px 0 var(--eo), 1.5px 0 0 var(--eo), -1.5px 0 0 var(--eo); }
 .cost.orb.changed { color: #7fff00; --eo: #1f5923; }
 .cost.orb.star { --eo: rgba(23,85,97,.86); font-size: 15px; }
-.cost.none { visibility: hidden; }
+.item.cardrow .cost.none { visibility: hidden; }
 .item.cardrow .cost { border: 0; }
 
 .mult { font-family: 'Kreon', Georgia, serif; font-weight: 700; font-size: 22px; color: #efc851; margin-bottom: 4px; }
