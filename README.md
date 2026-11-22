@@ -17,7 +17,9 @@ A GitHub Action runs it every 3 hours and commits only when a patch changed some
 
 `tools/event_sources.py` reads the installed game's `sts2.dll` to find which event grants which relic/card
 (many event relics are only granted in code, not named in event text). It writes `data/event_sources.json`,
-which `build_data.py` merges in. Run it after a patch that adds events: `pip install dnfile && python3 tools/event_sources.py`.
+which `build_data.py` merges in. A launchd agent on the Mac (`com.spirecompanion.eventsources`, working copy in
+`~/Library/Application Support/sts2-companion-sync/`) re-runs it whenever Steam updates the game, daily and at login,
+and pushes the file when it changes; that push triggers the Action. Manual run: `pip install dnfile && python3 tools/event_sources.py`.
 
 Images are loaded from the Spire Codex CDN and cached by the service worker. Game content © Mega Crit.
 

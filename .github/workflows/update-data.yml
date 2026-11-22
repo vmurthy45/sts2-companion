@@ -6,6 +6,10 @@ on:
   schedule:
     - cron: '23 */3 * * *'
   workflow_dispatch:
+  # The Mac pushes data/event_sources.json when a game update changes which event grants what.
+  push:
+    branches: [main]
+    paths: ['data/event_sources.json', 'tools/build_data.py']
 
 permissions:
   contents: write
