@@ -168,6 +168,13 @@ function moveSub(m, mv, str) {
   if (pw.length) bits.push(esc(pw.join(', ')));
   return bits.filter(Boolean).join(' · ');
 }
+// Power text bakes in an example stack size; show this enemy's actual amount instead.
+function powerDesc(d, amt) {
+  d = String(d || '');
+  if (amt == null) return d;
+  if (d.includes('[Amount]')) return d.replaceAll('[Amount]', amt);
+  return d.replace(/\[blue\]\d+\[\/blue\]/, `[blue]${amt}[/blue]`);
+}
 function powName(id) { const p = S.D.P[id]; return p ? p.name : title(id); }
 
 /* Render a turn sequence starting at a state id. Tracks self-Strength so later
@@ -300,7 +307,7 @@ function enemyBlock(m, opts = {}) {
   const innate = (m.innate || []).map(p => {
     const pw = D.P[p.power_id];
     const amt = innateAmt(p);
-    return `<div class="pw">${imgTag(pw?.img)}<div><b>${esc(pw?.name || title(p.power_id))}${amt != null ? ' ' + amt : ''}</b>${p.amount_ascension != null && amt !== p.amount ? ` <span class="was">(A0: ${p.amount})</span>` : ''}<div class="sub">${fmt(String(pw?.desc || '').replaceAll('[Amount]', amt ?? 'X'))}</div></div></div>`;
+    return `<div class="pw">${imgTag(pw?.img)}<div><b>${esc(pw?.name || title(p.power_id))}${amt != null ? ' ' + amt : ''}</b>${p.amount_ascension != null && amt !== p.amount ? ` <span class="was">(A0: ${p.amount})</span>` : ''}<div class="sub">${fmt(powerDesc(pw?.desc, amt))}</div></div></div>`;
   }).join('');
   const moves = (m.moves || []).map(mv => {
     const d = dmgOf(mv);
