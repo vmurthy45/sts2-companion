@@ -9,7 +9,7 @@ on:
   # The Mac pushes data/event_sources.json + monster_code.json (read from sts2.dll) after game updates.
   push:
     branches: [main]
-    paths: ['data/event_sources.json', 'data/monster_code.json', 'tools/build_data.py']
+    paths: ['data/event_sources.json', 'data/monster_code.json', 'data/encounter_code.json', 'tools/build_data.py']
 
 permissions:
   contents: write

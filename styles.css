@@ -346,3 +346,9 @@ h1 { font-size: 25px; }
 .cost.orb.star { --eo: rgba(23,85,97,.86); font-size: 15px; }
 .cost.none { visibility: hidden; }
 .item.cardrow .cost { border: 0; }
+
+.mult { font-family: 'Kreon', Georgia, serif; font-weight: 700; font-size: 22px; color: #efc851; margin-bottom: 4px; }
+.mult span { font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.enc .who b { color: var(--text); }
+/* card list: cost orb centred vertically in the row */
+.item.cardrow { align-items: center; }

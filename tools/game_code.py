@@ -15,6 +15,9 @@ records each Relic / Card model type those methods reference.
    or AscensionHelper.IsDread ? dreadValue : normalValue
    which gives the exact ascension level each value changes at, and Dread mode values.
    -> data/monster_code.json {MONSTER_ID: {Property: {lvl, a, n, dadd | dval}}}
+3. Encounter line-ups: how many of each monster an encounter's GenerateMonsters() creates
+   (Spire Codex lists each monster type once), which slots are random, and Dread differences.
+   -> data/encounter_code.json {ENCOUNTER_ID: {fixed: {M: n}, random: {n, from: [M]}, pool: [M], dread: {M: n}}}
 
 build_data.py merges both. Run after a patch on a Mac with the game installed
 (either branch): needs `pip install dnfile`. The Mac's launchd agent does this automatically.
@@ -171,10 +174,144 @@ def main():
     mpath = os.path.join(ROOT, 'data', 'monster_code.json')
     json.dump(monsters, open(mpath, 'w'), indent=1, sort_keys=True)
     print(f"{len(monsters)} monsters with ascension/Dread values -> {mpath}")
+    encs = encounter_lineups(pe, md, types, methods, owner, top, tname)
+    epath = os.path.join(ROOT, 'data', 'encounter_code.json')
+    json.dump(encs, open(epath, 'w'), indent=1, sort_keys=True)
+    print(f"{len(encs)} encounter line-ups -> {epath}")
     out['source'] = os.path.basename(os.path.dirname(dll))
     path = os.path.join(ROOT, 'data', 'event_sources.json')
     json.dump(out, open(path, 'w'), indent=1, sort_keys=True)
     print(f"{len(out['relics'])} relics, {len(out['cards'])} cards linked to events -> {path}")
+
+
+NS_ENCOUNTERS = 'MegaCrit.Sts2.Core.Models.Encounters'
+
+
+def encounter_lineups(pe, md, types, methods, owner, top, tname):
+    """Count the monsters GenerateMonsters() creates. Each creation is
+    ModelDb.Monster<T>() ... .ToMutable(); random picks go through Rng.NextItem.
+    Only clear patterns get exact counts; anything else is marked random."""
+    def uncompress(b, i):
+        x = b[i]
+        if x & 0x80 == 0: return x, i + 1
+        if x & 0xC0 == 0x80: return ((x & 0x3F) << 8) | b[i + 1], i + 2
+        return ((x & 0x1F) << 24) | (b[i + 1] << 16) | (b[i + 2] << 8) | b[i + 3], i + 4
+
+    def name_of(tok):
+        t, r = tok >> 24, tok & 0xFFFFFF
+        try:
+            if t == 0x06:
+                return str(methods[r - 1].Name)
+            if t == 0x0A:
+                return str(md.MemberRef[r - 1].Name)
+            if t == 0x2B:
+                ms = md.MethodSpec[r - 1]
+                b = bytes(ms.Instantiation.value if hasattr(ms.Instantiation, 'value') else ms.Instantiation)
+                mm = ms.Method
+                base = str(methods[mm.row_index - 1].Name) if mm.table.name == 'MethodDef' else str(md.MemberRef[mm.row_index - 1].Name)
+                if base == 'Monster':
+                    i = 0
+                    while i < len(b):
+                        if b[i] in (0x12, 0x11):
+                            v, j = uncompress(b, i + 1)
+                            if v & 3 == 0:
+                                return 'Monster:' + snake(str(types[(v >> 2) - 1].TypeName))
+                            i = j
+                        else:
+                            i += 1
+                return base
+        except Exception:
+            pass
+        return '?'
+
+    def calls_of(m):
+        hdr = pe.get_data(m.Rva, 12)
+        code = pe.get_data(m.Rva + 1, hdr[0] >> 2) if hdr[0] & 3 == 2 else \
+            pe.get_data(m.Rva + (hdr[1] >> 4) * 4, int.from_bytes(hdr[4:8], 'little'))
+        return [x[1] for x in il_seq(code, name_of) if x[0] == 'call']
+
+    per = {}
+    for mi, m in enumerate(methods, 1):
+        ti = owner.get(mi)
+        if not ti or not m.Rva:
+            continue
+        tt = top(ti)
+        ns, tn = tname(tt)
+        if ns != NS_ENCOUNTERS or tn.startswith('<'):
+            continue
+        name = str(m.Name)
+        nested = ti != tt
+        try:
+            calls = calls_of(m)
+        except Exception:
+            continue
+        e = per.setdefault(snake(tn), {'gen': [], 'lambda': [], 'pool': set(), 'all': set()})
+        if name == 'GenerateMonsters' and not nested:
+            e['gen'] = calls
+        elif nested and 'GenerateMonsters' in str(types[ti - 1].TypeName) + name:
+            e['lambda'] += calls
+        if name == '.cctor' or nested:      # static pools / lambdas: candidates for random slots
+            e['pool'] |= {c[8:] for c in calls if c.startswith('Monster:')}
+        if name == 'get_AllPossibleMonsters':  # everything that can be in the fight, summons included
+            e['all'] |= {c[8:] for c in calls if c.startswith('Monster:')}
+
+    out = {}
+    for eid, e in per.items():
+        gen = e['gen']
+        if not gen:
+            continue
+        rec = {}
+        has_random = any(c in ('NextItem', 'NextBool', 'NextInt', 'Shuffle') for c in gen)
+        # creations: Monster<T> then ToMutable = one monster (None = picked at random);
+        # Monster<T> straight into list.Add = one monster made mutable later in a lambda.
+        # `made` keeps run breaks (other calls) so IsDread branches can be told apart.
+        made, pending, breaks = [], None, []
+        for c in gen:
+            if c.startswith('Monster:'):
+                pending = c[8:]
+            elif c == 'ToMutable' or (c == 'Add' and pending):
+                made.append(pending)
+                pending = None
+            elif c not in ('get_Rng', 'NextItem'):
+                if made and (not breaks or breaks[-1] != len(made)):
+                    breaks.append(len(made))
+                pending = None if c in ('.ctor', 'SetCount') else pending
+        fixed = {}
+        for t in made:
+            if t:
+                fixed[t] = fixed.get(t, 0) + 1
+        unknown = made.count(None)
+        mentioned = {c[8:] for c in gen if c.startswith('Monster:')}
+        if 'IsDread' in gen:
+            # IsDread ? [run A] : [run B]  -> the first run of a type is the Dread line-up
+            runs, cur = [], None
+            for i, t in enumerate(made):
+                if cur and cur[0] == t and i not in breaks:
+                    cur[1] += 1
+                else:
+                    cur = [t, 1]; runs.append(cur)
+            seen, dread, normal = {}, {}, {}
+            for t, n in runs:
+                if t in seen:
+                    dread[t], normal[t] = seen[t], n
+                else:
+                    seen[t] = n
+            if dread:
+                for t in dread:
+                    fixed[t] = normal[t]
+                rec['dread'] = {t: dread[t] for t in dread}
+        if fixed:
+            rec['fixed'] = fixed
+        rpool = (e['pool'] | mentioned) - set(fixed) - set(rec.get('dread', {}))
+        if has_random or unknown:
+            exact = unknown and 'Where' not in gen and 'ToMutable' not in e['lambda']
+            if rpool or unknown:   # RNG used only to order/vary a fixed line-up is not a random slot
+                rec['random'] = {'n': unknown if exact else None, 'from': sorted(rpool)}
+        summons = e['all'] - set(fixed) - set(rec.get('dread', {})) - (rpool if 'random' in rec else set())
+        if summons:
+            rec['summons'] = sorted(summons)
+        out[eid] = rec
+    return out
 
 
 NS_MONSTERS = 'MegaCrit.Sts2.Core.Models.Monsters'

@@ -172,6 +172,21 @@ def build(folder, pools_path, branch_name):
                            'act': act_of(e.get('act'), e['id']), 'tags': e.get('tags'),
                            'monsters': [m['id'] for m in e.get('monsters') or []]})
     enc_by_id = {e['id']: e for e in encounters}
+    # line-ups read from the game code: how many of each monster, random slots, summons, Dread
+    ep = os.path.join(OUT, 'encounter_code.json')
+    lineups = json.load(open(ep, encoding='utf-8')) if os.path.exists(ep) else {}
+    for e in encounters:
+        lu = lineups.get(e['id'])
+        if not lu:
+            continue
+        listed = set(e['monsters'])
+        named = set(lu.get('fixed', {})) | set(lu.get('dread', {})) | set(lu.get('summons', []))
+        if not (set(lu.get('fixed', {})) <= listed):
+            continue                       # line-up from another game version; keep Codex's list
+        e['lineup'] = dict(lu)
+        if 'random' in lu:
+            pool = [m for m in lu['random'].get('from', []) if m in listed] or sorted(listed - named)
+            e['lineup']['random'] = dict(lu['random'], **{'from': pool})
 
     monsters = []
     for m in load(folder, 'monsters'):

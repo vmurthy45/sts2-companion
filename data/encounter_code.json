@@ -1,0 +1,537 @@
+{
+ "AEONGLASS_BOSS": {
+  "fixed": {
+   "AEONGLASS": 1
+  }
+ },
+ "AXEBOTS_NORMAL": {
+  "fixed": {
+   "AXEBOT": 1
+  }
+ },
+ "BATTLEWORN_DUMMY_EVENT_V1_ENCOUNTER": {
+  "fixed": {
+   "BATTLE_FRIEND_V1": 1
+  }
+ },
+ "BATTLEWORN_DUMMY_EVENT_V2_ENCOUNTER": {
+  "fixed": {
+   "BATTLE_FRIEND_V2": 1
+  }
+ },
+ "BATTLEWORN_DUMMY_EVENT_V3_ENCOUNTER": {
+  "fixed": {
+   "BATTLE_FRIEND_V3": 1
+  }
+ },
+ "BOWLBUGS_NORMAL": {
+  "fixed": {
+   "BOWLBUG_ROCK": 1
+  },
+  "random": {
+   "from": [
+    "BOWLBUG_EGG",
+    "BOWLBUG_NECTAR",
+    "BOWLBUG_SILK"
+   ],
+   "n": null
+  }
+ },
+ "BOWLBUGS_WEAK": {
+  "fixed": {
+   "BOWLBUG_ROCK": 1
+  },
+  "random": {
+   "from": [],
+   "n": 1
+  }
+ },
+ "BYGONE_EFFIGY_ELITE": {
+  "fixed": {
+   "BYGONE_EFFIGY": 1
+  }
+ },
+ "BYRDONIS_ELITE": {
+  "fixed": {
+   "BYRDONIS": 1
+  }
+ },
+ "CEREMONIAL_BEAST_BOSS": {
+  "fixed": {
+   "CEREMONIAL_BEAST": 1
+  }
+ },
+ "CHOMPERS_NORMAL": {
+  "fixed": {
+   "CHOMPER": 2
+  }
+ },
+ "CONSTRUCT_MENAGERIE_NORMAL": {
+  "fixed": {
+   "CUBEX_CONSTRUCT": 2,
+   "PUNCH_CONSTRUCT": 1
+  }
+ },
+ "CORPSE_SLUGS_NORMAL": {
+  "fixed": {
+   "CORPSE_SLUG": 3
+  }
+ },
+ "CORPSE_SLUGS_WEAK": {
+  "fixed": {
+   "CORPSE_SLUG": 2
+  }
+ },
+ "CUBEX_CONSTRUCT_NORMAL": {
+  "fixed": {
+   "CUBEX_CONSTRUCT": 1
+  }
+ },
+ "CULTISTS_NORMAL": {
+  "fixed": {
+   "CALCIFIED_CULTIST": 1,
+   "DAMP_CULTIST": 1
+  }
+ },
+ "DECIMILLIPEDE_ELITE": {
+  "fixed": {
+   "DECIMILLIPEDE_SEGMENT_BACK": 1,
+   "DECIMILLIPEDE_SEGMENT_FRONT": 1,
+   "DECIMILLIPEDE_SEGMENT_MIDDLE": 1
+  }
+ },
+ "DENSE_VEGETATION_EVENT_ENCOUNTER": {
+  "fixed": {
+   "WRIGGLER": 1
+  }
+ },
+ "DEPRECATED_ENCOUNTER": {},
+ "DEVOTED_SCULPTOR_WEAK": {
+  "fixed": {
+   "DEVOTED_SCULPTOR": 1
+  }
+ },
+ "ENTOMANCER_ELITE": {
+  "fixed": {
+   "ENTOMANCER": 1
+  }
+ },
+ "EXOSKELETONS_NORMAL": {
+  "fixed": {
+   "EXOSKELETON": 4
+  }
+ },
+ "EXOSKELETONS_WEAK": {
+  "fixed": {
+   "EXOSKELETON": 3
+  }
+ },
+ "FABRICATOR_NORMAL": {
+  "fixed": {
+   "FABRICATOR": 1
+  }
+ },
+ "FAKE_MERCHANT_EVENT_ENCOUNTER": {
+  "fixed": {
+   "FAKE_MERCHANT_MONSTER": 1
+  }
+ },
+ "FLYCONID_NORMAL": {
+  "fixed": {
+   "FLYCONID": 1
+  },
+  "random": {
+   "from": [
+    "LEAF_SLIME_M",
+    "TWIG_SLIME_M"
+   ],
+   "n": 1
+  }
+ },
+ "FOGMOG_NORMAL": {
+  "fixed": {
+   "FOGMOG": 1
+  },
+  "summons": [
+   "EYE_WITH_TEETH"
+  ]
+ },
+ "FOSSIL_STALKER_NORMAL": {
+  "fixed": {
+   "FOSSIL_STALKER": 1
+  }
+ },
+ "FROG_KNIGHT_NORMAL": {
+  "fixed": {
+   "FROG_KNIGHT": 1
+  }
+ },
+ "FUZZY_WURM_CRAWLER_WEAK": {
+  "fixed": {
+   "FUZZY_WURM_CRAWLER": 1
+  }
+ },
+ "GLOBE_HEAD_NORMAL": {
+  "fixed": {
+   "GLOBE_HEAD": 1
+  }
+ },
+ "GREMLIN_MERC_NORMAL": {
+  "fixed": {
+   "GREMLIN_MERC": 1
+  },
+  "summons": [
+   "FAT_GREMLIN",
+   "SNEAKY_GREMLIN"
+  ]
+ },
+ "HAUNTED_SHIP_NORMAL": {
+  "fixed": {
+   "HAUNTED_SHIP": 1
+  }
+ },
+ "HUNTER_KILLER_NORMAL": {
+  "fixed": {
+   "HUNTER_KILLER": 1
+  }
+ },
+ "INFESTED_PRISMS_ELITE": {
+  "fixed": {
+   "INFESTED_PRISM": 1
+  }
+ },
+ "INKLETS_NORMAL": {
+  "fixed": {
+   "INKLET": 3
+  }
+ },
+ "KAISER_CRAB_BOSS": {
+  "fixed": {
+   "CRUSHER": 1,
+   "ROCKET": 1
+  }
+ },
+ "KNIGHTS_ELITE": {
+  "fixed": {
+   "FLAIL_KNIGHT": 1,
+   "MAGI_KNIGHT": 1,
+   "SPECTRAL_KNIGHT": 1
+  }
+ },
+ "KNOWLEDGE_DEMON_BOSS": {
+  "fixed": {
+   "KNOWLEDGE_DEMON": 1
+  }
+ },
+ "LAGAVULIN_MATRIARCH_BOSS": {
+  "fixed": {
+   "LAGAVULIN_MATRIARCH": 1
+  }
+ },
+ "LIVING_FOG_NORMAL": {
+  "fixed": {
+   "LIVING_FOG": 1
+  },
+  "summons": [
+   "GAS_BOMB"
+  ]
+ },
+ "LOUSE_PROGENITOR_NORMAL": {
+  "fixed": {
+   "LOUSE_PROGENITOR": 1
+  }
+ },
+ "MAWLER_NORMAL": {
+  "fixed": {
+   "MAWLER": 1
+  }
+ },
+ "MECHA_KNIGHT_ELITE": {
+  "fixed": {
+   "MECHA_KNIGHT": 1
+  }
+ },
+ "MYSTERIOUS_KNIGHT_EVENT_ENCOUNTER": {
+  "fixed": {
+   "MYSTERIOUS_KNIGHT": 1
+  }
+ },
+ "MYTES_NORMAL": {
+  "fixed": {
+   "MYTE": 2
+  }
+ },
+ "NIBBITS_NORMAL": {
+  "fixed": {
+   "NIBBIT": 2
+  }
+ },
+ "NIBBITS_WEAK": {
+  "fixed": {
+   "NIBBIT": 1
+  }
+ },
+ "OVERGROWTH_CRAWLERS": {
+  "fixed": {
+   "FUZZY_WURM_CRAWLER": 1,
+   "SHRINKER_BEETLE": 1
+  }
+ },
+ "OVICOPTER_NORMAL": {
+  "fixed": {
+   "OVICOPTER": 1
+  },
+  "summons": [
+   "TOUGH_EGG"
+  ]
+ },
+ "OWL_MAGISTRATE_NORMAL": {
+  "fixed": {
+   "OWL_MAGISTRATE": 1
+  }
+ },
+ "PHANTASMAL_GARDENERS_ELITE": {
+  "fixed": {
+   "PHANTASMAL_GARDENER": 4
+  }
+ },
+ "PHROG_PARASITE_ELITE": {
+  "fixed": {
+   "PHROG_PARASITE": 1
+  },
+  "summons": [
+   "WRIGGLER"
+  ]
+ },
+ "PUNCH_CONSTRUCT_NORMAL": {
+  "fixed": {
+   "PUNCH_CONSTRUCT": 1
+  }
+ },
+ "PUNCH_OFF_EVENT_ENCOUNTER": {
+  "fixed": {
+   "PUNCH_CONSTRUCT": 2
+  }
+ },
+ "QUEEN_BOSS": {
+  "fixed": {
+   "QUEEN": 1,
+   "TORCH_HEAD_AMALGAM": 1
+  }
+ },
+ "RUBY_RAIDERS_NORMAL": {
+  "random": {
+   "from": [
+    "ASSASSIN_RUBY_RAIDER",
+    "AXE_RUBY_RAIDER",
+    "BRUTE_RUBY_RAIDER",
+    "CROSSBOW_RUBY_RAIDER",
+    "TRACKER_RUBY_RAIDER"
+   ],
+   "n": null
+  }
+ },
+ "SCROLLS_OF_BITING_NORMAL": {
+  "fixed": {
+   "SCROLL_OF_BITING": 4
+  }
+ },
+ "SCROLLS_OF_BITING_WEAK": {
+  "fixed": {
+   "SCROLL_OF_BITING": 3
+  }
+ },
+ "SEAPUNK_NORMAL": {
+  "fixed": {
+   "CALCIFIED_CULTIST": 1,
+   "SEAPUNK": 1
+  }
+ },
+ "SEAPUNK_WEAK": {
+  "fixed": {
+   "SEAPUNK": 1
+  }
+ },
+ "SEWER_CLAM_NORMAL": {
+  "fixed": {
+   "SEWER_CLAM": 1
+  }
+ },
+ "SHRINKER_BEETLE_WEAK": {
+  "fixed": {
+   "SHRINKER_BEETLE": 1
+  }
+ },
+ "SKULKING_COLONY_ELITE": {
+  "fixed": {
+   "SKULKING_COLONY": 1
+  }
+ },
+ "SLIMED_BERSERKER_NORMAL": {
+  "fixed": {
+   "SLIMED_BERSERKER": 1
+  }
+ },
+ "SLIMES_NORMAL": {
+  "fixed": {
+   "LEAF_SLIME_M": 1,
+   "TWIG_SLIME_M": 1
+  },
+  "random": {
+   "from": [
+    "LEAF_SLIME_S",
+    "TWIG_SLIME_S"
+   ],
+   "n": 2
+  }
+ },
+ "SLIMES_WEAK": {
+  "random": {
+   "from": [
+    "LEAF_SLIME_M",
+    "LEAF_SLIME_S",
+    "TWIG_SLIME_M",
+    "TWIG_SLIME_S"
+   ],
+   "n": 3
+  }
+ },
+ "SLITHERING_STRANGLER_NORMAL": {
+  "fixed": {
+   "SLITHERING_STRANGLER": 1
+  },
+  "random": {
+   "from": [
+    "LEAF_SLIME_M",
+    "LEAF_SLIME_S",
+    "SNAPPING_JAXFRUIT",
+    "TWIG_SLIME_M",
+    "TWIG_SLIME_S"
+   ],
+   "n": null
+  }
+ },
+ "SLUDGE_SPINNER_WEAK": {
+  "fixed": {
+   "SLUDGE_SPINNER": 1
+  }
+ },
+ "SLUMBERING_BEETLE_NORMAL": {
+  "fixed": {
+   "BOWLBUG_ROCK": 1,
+   "BOWLBUG_SILK": 1,
+   "SLUMBERING_BEETLE": 1
+  }
+ },
+ "SNAPPING_JAXFRUIT_NORMAL": {
+  "fixed": {
+   "FLYCONID": 1,
+   "SNAPPING_JAXFRUIT": 1
+  }
+ },
+ "SOUL_FYSH_BOSS": {
+  "fixed": {
+   "SOUL_FYSH": 1
+  }
+ },
+ "SOUL_NEXUS_ELITE": {
+  "fixed": {
+   "SOUL_NEXUS": 1
+  }
+ },
+ "SPINY_TOAD_NORMAL": {
+  "fixed": {
+   "SPINY_TOAD": 1
+  }
+ },
+ "TERROR_EEL_ELITE": {
+  "fixed": {
+   "TERROR_EEL": 1
+  }
+ },
+ "TEST_SUBJECT_BOSS": {
+  "fixed": {
+   "TEST_SUBJECT": 1
+  }
+ },
+ "THE_ARCHITECT_EVENT_ENCOUNTER": {
+  "fixed": {
+   "ARCHITECT": 1
+  }
+ },
+ "THE_INSATIABLE_BOSS": {
+  "fixed": {
+   "THE_INSATIABLE": 1
+  }
+ },
+ "THE_KIN_BOSS": {
+  "dread": {
+   "KIN_FOLLOWER": 3
+  },
+  "fixed": {
+   "KIN_FOLLOWER": 2,
+   "KIN_PRIEST": 1
+  }
+ },
+ "THE_LOST_AND_FORGOTTEN_NORMAL": {
+  "fixed": {
+   "THE_FORGOTTEN": 1,
+   "THE_LOST": 1
+  }
+ },
+ "THE_OBSCURA_NORMAL": {
+  "fixed": {
+   "THE_OBSCURA": 1
+  },
+  "summons": [
+   "PARAFRIGHT"
+  ]
+ },
+ "THIEVING_HOPPER_WEAK": {
+  "fixed": {
+   "THIEVING_HOPPER": 1
+  }
+ },
+ "TOADPOLES_WEAK": {
+  "fixed": {
+   "TOADPOLE": 2
+  }
+ },
+ "TUNNELER_NORMAL": {
+  "fixed": {
+   "CHOMPER": 1,
+   "TUNNELER": 1
+  }
+ },
+ "TUNNELER_WEAK": {
+  "fixed": {
+   "TUNNELER": 1
+  }
+ },
+ "TURRET_OPERATOR_WEAK": {
+  "fixed": {
+   "LIVING_SHIELD": 1,
+   "TURRET_OPERATOR": 1
+  }
+ },
+ "TWO_TAILED_RATS_NORMAL": {
+  "fixed": {
+   "TWO_TAILED_RAT": 3
+  }
+ },
+ "VANTOM_BOSS": {
+  "fixed": {
+   "VANTOM": 1
+  }
+ },
+ "VINE_SHAMBLER_NORMAL": {
+  "fixed": {
+   "VINE_SHAMBLER": 1
+  }
+ },
+ "WATERFALL_GIANT_BOSS": {
+  "fixed": {
+   "WATERFALL_GIANT": 1
+  }
+ }
+}

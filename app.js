@@ -250,7 +250,15 @@ function renderPattern(m) {
     h += renderSeq(m, model, P.initial_move, 1, str0);
   } else {
     const rs = P.states.find(s => s.type === 'random');
-    h += rs ? `<div class="note">Picks at random each turn:</div>${renderRandom(m, model, rs)}` : '';
+    const first = P.states.find(s => s.type === 'move');
+    const cs = P.states.find(s => s.type === 'conditional' && (s.branches || []).length);
+    if (rs) h += `<div class="note">Picks at random each turn:</div>${renderRandom(m, model, rs)}`;
+    else if (cs) h += `<div class="note">Opening move depends on the situation:</div>${renderCond(m, model, cs, 1, str0)}`;
+    else if (first) {
+      // a loop with no fixed opener: the game picks where each one starts (e.g. Corpse Slugs start on different moves)
+      const steps = walk(model, first.id).filter(x => x.kind === 'move');
+      h += `<div class="note">Repeats this loop. The move it starts on varies${(m.encounters || []).some(id => (S.D.E[id]?.lineup?.fixed?.[m.id] || 0) > 1) ? ' (in a group, each one starts on a different move)' : ''}:</div>${renderSeq(m, model, first.id, 1, str0).replace(/Turn (\d+)/g, 'Move $1').replace(/from turn (\d+)/g, 'from move $1')}`;
+    }
   }
   // Moves that never show up in the walk (e.g. triggered by HP thresholds or deaths)
   const shown = new Set();
@@ -434,11 +442,27 @@ V.enemy = (id) => {
 };
 const ascNote = () => `<div class="note faint" style="margin-top:20px">Each value switches at the ascension level the game code uses (HP and block mostly at A8 Tough Enemies, damage at A9 Deadly Enemies). Dread adds the boss buffs read from the game code. Strength gained from its own moves is added to later turns; your Weak, Vulnerable and Block are not.</div>`;
 
+/* Fight line-up from the game code: fixed counts, random slots, summons (Dread can differ) */
+function lineup(e) {
+  const D = S.D, lu = e.lineup;
+  if (!lu) return { fixed: (e.monsters || []).map(id => ({ m: D.M[id], n: 1 })).filter(x => x.m), random: null, summons: [] };
+  const counts = Object.assign({}, lu.fixed || {}, isDread() ? (lu.dread || {}) : {});
+  return {
+    fixed: Object.entries(counts).map(([id, n]) => ({ m: D.M[id], n })).filter(x => x.m),
+    random: lu.random ? { n: lu.random.n, from: (lu.random.from || []).map(id => D.M[id]).filter(Boolean) } : null,
+    summons: (lu.summons || []).map(id => D.M[id]).filter(Boolean),
+  };
+}
 function encRow(e) {
-  const D = S.D;
-  const ms = (e.monsters || []).map(id => D.M[id]).filter(Boolean);
+  const L = lineup(e);
   const label = e.weak ? 'Weak' : (e.room === 'Monster' ? 'Normal' : e.room);
-  return `<a class="enc" href="#/fight/${e.id}"><div class="thumbs">${[...new Map(ms.map(m => [m.id, m])).values()].slice(0, 3).map(m => imgTag(m.img, '', m.name)).join('')}</div><div class="body"><b>${esc(e.name)}</b> ${typeBadge(label)}<div class="who">${ms.map(m => { const h = hpOf(m); return `${esc(m.name)} ${range(h.lo, h.hi)}`; }).join(' · ')}</div></div><span class="faint">›</span></a>`;
+  const thumbs = [...L.fixed.map(x => x.m), ...(L.random?.from || [])].slice(0, 3);
+  const who = [
+    ...L.fixed.map(({ m, n }) => { const h = hpOf(m); return `${n > 1 ? `<b>${n}×</b> ` : ''}${esc(m.name)} ${range(h.lo, h.hi)}`; }),
+    L.random ? `${L.random.n ? `<b>${L.random.n}×</b> random` : 'random'}: ${L.random.from.map(m => esc(m.name)).join(' / ')}` : '',
+    L.summons.length ? `summons ${L.summons.map(m => esc(m.name)).join(', ')}` : '',
+  ].filter(Boolean).join(' · ');
+  return `<a class="enc" href="#/fight/${e.id}"><div class="thumbs">${thumbs.map(m => imgTag(m.img, '', m.name)).join('')}</div><div class="body"><b>${esc(e.name)}</b> ${typeBadge(label)}<div class="who">${who}</div></div><span class="faint">›</span></a>`;
 }
 
 V.fights = () => {
@@ -473,12 +497,22 @@ V.fights = () => {
 V.fight = (id) => {
   const D = S.D, e = D.E[id];
   if (!e) return notFound();
-  const ms = (e.monsters || []).map(x => D.M[x]).filter(Boolean);
+  const L = lineup(e);
   const label = e.weak ? 'Weak' : (e.room === 'Monster' ? 'Normal' : e.room);
-  const total = ms.reduce((a, m) => { const h = hpOf(m); return [a[0] + (h.lo || 0), a[1] + (h.hi || h.lo || 0)]; }, [0, 0]);
+  let lo = 0, hi = 0, count = 0;
+  for (const { m, n } of L.fixed) { const h = hpOf(m); lo += n * (h.lo || 0); hi += n * (h.hi || h.lo || 0); count += n; }
+  const exact = !L.random || L.random.n;
+  if (L.random?.n && L.random.from.length) {
+    const hs = L.random.from.map(m => hpOf(m));
+    lo += L.random.n * Math.min(...hs.map(h => h.lo || 0)); hi += L.random.n * Math.max(...hs.map(h => h.hi || h.lo || 0)); count += L.random.n;
+  }
+  const block = (m, n, note) => `<div class="fight-mon">${n > 1 || note ? `<div class="mult">${n > 1 ? `${n}×` : ''}${note ? ` <span>${esc(note)}</span>` : ''}</div>` : ''}${enemyBlock(m, { link: true, noEncounters: true })}</div>`;
   $('#view').innerHTML = backBtn() + `<h1>${esc(e.name)}</h1><div>${typeBadge(label)} ${actBadge(e.act)}</div>
-    <div class="stats"><div class="stat"><b class="hp">${range(total[0], total[1])}</b><span>Total HP · ${ascLabel(S.asc)}</span></div><div class="stat"><b>${ms.length}</b><span>Enemies</span></div></div>
-    ${ms.map(m => `<div class="fight-mon">${enemyBlock(m, { link: true, noEncounters: true })}</div>`).join('')}` + ascNote();
+    <div class="stats"><div class="stat"><b class="hp">${exact ? range(lo, hi) : range(lo, hi) + '+'}</b><span>Total HP · ${ascLabel(S.asc)}</span></div><div class="stat"><b>${exact ? count : count + '+'}</b><span>Enemies</span></div></div>
+    ${e.lineup?.dread ? `<div class="note">${isDread() ? 'Dread line-up shown.' : `In Dread: ${Object.entries(e.lineup.dread).map(([k, n]) => `${n}× ${esc(D.M[k]?.name || k)}`).join(', ')}.`}</div>` : ''}
+    ${L.fixed.map(({ m, n }) => block(m, n)).join('')}
+    ${L.random ? `<h2>${L.random.n ? `${L.random.n} random` : 'Random'} from these</h2>${L.random.from.map(m => block(m, 1, 'possible')).join('')}` : ''}
+    ${L.summons.length ? `<h2>Summoned during the fight</h2>${L.summons.map(m => block(m, 1, 'summoned')).join('')}` : ''}` + ascNote();
 };
 
 /* ---- cards ---- */
