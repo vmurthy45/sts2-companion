@@ -33,3 +33,10 @@ Past A10 the stepper reaches **Dread** (beta only): the boss buffs from the game
 
 `python3 -m http.server 8260` and open http://localhost:8260 (the service worker is skipped on localhost).
 Bump `CACHE` in `sw.js` after changing any app-shell file.
+
+## Credits
+
+Game data and images (including the card-frame pieces) come from [Spire Codex](https://spire-codex.com) and are loaded from its CDN,
+cached by the service worker. The card render's layout numbers are adapted from Spire Codex's `CardRender` component
+(PolyForm Noncommercial 1.0.0, https://polyformproject.org/licenses/noncommercial/1.0.0;
+Required Notice: Copyright © 2025-present Peter Lord and Spire Codex contributors). Game content © Mega Crit.
