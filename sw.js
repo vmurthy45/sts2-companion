@@ -1,6 +1,6 @@
 // Bump CACHE whenever any app-shell file changes, or installed copies keep the old version.
 // Game data (data/*.json) is fetched network-first, so patches arrive without a bump.
-const CACHE = 'spire-v8';
+const CACHE = 'spire-v9';
 const IMG = 'spire-img-v1';
 const ASSETS = ['./', 'index.html', 'app.js', 'styles.css', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png', 'apple-touch-icon-precomposed.png', 'favicon.ico', 'favicon-32.png'];
 
@@ -35,10 +35,16 @@ self.addEventListener('fetch', e => {
     }));
     return;
   }
-  // App shell: cache first, refresh in the background.
+  // App shell: network first so a new version shows up on the next open (iOS home-screen apps
+  // otherwise kept showing the old copy); fall back to the cache when offline or slow (>3s).
   e.respondWith(caches.open(CACHE).then(async c => {
-    const hit = await c.match(req, { ignoreSearch: true });
-    const net = fetch(req).then(r => { if (r.ok) c.put(req, r.clone()); return r; }).catch(() => hit);
-    return hit || net;
+    const net = fetch(req, { cache: 'no-cache' }).then(r => { if (r.ok) c.put(req, r.clone()); return r; });
+    net.catch(() => {});
+    const timeout = new Promise(res => setTimeout(res, 3000));
+    try {
+      const r = await Promise.race([net, timeout]);
+      if (r) return r;
+    } catch {}
+    return (await c.match(req, { ignoreSearch: true })) || net;
   }));
 });

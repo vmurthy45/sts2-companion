@@ -997,6 +997,14 @@ async function boot() {
   try { S.D = await loadBranch(S.branch); }
   catch (e) { $('#view').innerHTML = '<div class="empty">Couldn’t load game data. Check your connection and reopen.</div>'; return; }
   paintHeader(); route(false);
-  if ('serviceWorker' in navigator && location.hostname !== 'localhost') navigator.serviceWorker.register('sw.js').catch(() => {});
+  if ('serviceWorker' in navigator && location.hostname !== 'localhost') {
+    // Check for a new version on every open / return to the app, and reload once when it takes over.
+    navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then(reg => {
+      document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') reg.update().catch(() => {}); });
+    }).catch(() => {});
+    let reloaded = false;
+    const hadController = !!navigator.serviceWorker.controller;
+    navigator.serviceWorker.addEventListener('controllerchange', () => { if (hadController && !reloaded) { reloaded = true; location.reload(); } });
+  }
 }
 boot();
