@@ -1,6 +1,6 @@
 // Bump CACHE whenever any app-shell file changes, or installed copies keep the old version.
 // Game data (data/*.json) is fetched network-first, so patches arrive without a bump.
-const CACHE = 'spire-v2';
+const CACHE = 'spire-v3';
 const IMG = 'spire-img-v1';
 const ASSETS = ['./', 'index.html', 'app.js', 'styles.css', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png'];
 
@@ -16,7 +16,7 @@ self.addEventListener('fetch', e => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
   // Enemy/card/relic art from the Spire Codex CDN: cache first, keep forever.
-  if (url.hostname === 'cdn.spire-codex.com') {
+  if (url.hostname === 'cdn.spire-codex.com' || url.hostname === 'fonts.gstatic.com' || url.hostname === 'fonts.googleapis.com' || url.hostname === 'clan.akamai.steamstatic.com') {
     e.respondWith(caches.open(IMG).then(async c => {
       const hit = await c.match(req);
       if (hit) return hit;

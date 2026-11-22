@@ -1,5 +1,5 @@
 'use strict';
-/* Spire Companion: Slay the Spire 2 reference. Data comes from data/{main,beta}.json,
+/* Spire Buddy: Slay the Spire 2 reference. Data comes from data/{main,beta}.json,
    rebuilt daily by tools/build_data.py from Spire Codex's extracted game data. */
 
 const $ = (s, el = document) => el.querySelector(s);
@@ -9,10 +9,20 @@ const store = {
   set(k, v) { try { localStorage.setItem('sc.' + k, JSON.stringify(v)); } catch {} },
 };
 
-// Ascension thresholds (from the in-game ascension list):
-//   A8 "Tough Enemies"  -> monster HP (and innate power amounts) use the ascension values
-//   A9 "Deadly Enemies" -> move damage and hit counts use the ascension values
-const HP_ASC = 8, DMG_ASC = 9;
+// Default ascension thresholds when the game code gives no exact level:
+//   A8 "Tough Enemies" -> HP, block, innate powers;  A9 "Deadly Enemies" -> damage, hit counts.
+// tools/game_code.py reads the exact level for each value from sts2.dll (m.sc / mv.sc / power.sc).
+// DREAD (11) = Dread mode: every ascension on, plus the boss buffs read from the game code.
+const HP_ASC = 8, DMG_ASC = 9, DREAD = 11;
+const isDread = () => S.asc >= DREAD;
+const ascLabel = a => a >= DREAD ? 'Dread' : 'A' + a;
+// value at the current ascension for a {lvl, a, n, dadd, dval} record from the game code
+function scVal(r, fallback) {
+  if (!r) return fallback;
+  let v = r.lvl != null && S.asc >= r.lvl && r.a != null ? r.a : (r.n ?? fallback);
+  if (isDread()) { if (r.dval != null) v = r.dval; if (r.dadd) v += r.dadd; }
+  return v;
+}
 const ACT_ORDER = ['Overgrowth', 'Underdocks', 'Hive', 'Glory', 'Event', 'Other'];
 const ACT_NUM = { Overgrowth: 'Act 1', Underdocks: 'Act 1', Hive: 'Act 2', Glory: 'Act 3' };
 const TYPE_ORDER = { Weak: 0, Normal: 1, Monster: 1, Elite: 2, Boss: 3 };
@@ -44,7 +54,7 @@ async function loadBranch(b) {
 function index(D) {
   const by = (arr) => Object.fromEntries((arr || []).map(x => [x.id, x]));
   D.M = by(D.monsters); D.E = by(D.encounters); D.C = by(D.cards); D.R = by(D.relics);
-  D.EV = by(D.events); D.P = by(D.powers); D.PO = by(D.potions); D.A = by(D.acts);
+  D.EV = by(D.events); D.AN = by(D.ancients); D.EN = by(D.enchantments); D.P = by(D.powers); D.PO = by(D.potions); D.A = by(D.acts);
   D.byName = {};
   for (const p of D.powers || []) D.byName[norm(p.name)] = p;
   D.cardByName = {};
@@ -78,20 +88,27 @@ const strip = s => String(s || '').replace(/\[[^\]]*\]/g, '');
 /* ---------------- ascension maths ---------------- */
 function hpOf(m, asc = S.asc) {
   const [mn, mx, amn, amx] = m.hp || [];
-  const useA = asc >= HP_ASC && amn != null;
-  const lo = useA ? amn : mn, hi = useA ? (amx ?? amn) : (mx ?? mn);
-  return { lo, hi, base: useA ? [mn, mx ?? mn] : null };
+  const lvl = m.sc?.hp?.lvl ?? HP_ASC;
+  const useA = asc >= lvl && amn != null;
+  let lo = useA ? amn : mn, hi = useA ? (amx ?? amn) : (mx ?? mn);
+  const add = asc >= DREAD ? (m.sc?.hp?.dadd || 0) : 0;
+  if (add && lo != null) { lo += add; hi = (hi ?? lo - add) + add; }
+  return { lo, hi, base: useA || add ? [mn, mx ?? mn] : null, lvl, dread: add };
 }
 const range = (lo, hi) => lo == null ? '?' : (hi != null && hi !== lo ? `${lo}–${hi}` : `${lo}`);
 function dmgOf(mv, asc = S.asc) {
   const d = mv.damage; if (!d) return null;
-  const a = asc >= DMG_ASC;
-  const n = a && d.ascension != null ? d.ascension : d.normal;
-  const hits = a && d.hit_count_ascension != null ? d.hit_count_ascension : d.hit_count;
-  const changed = a && ((d.ascension != null && d.ascension !== d.normal) || (d.hit_count_ascension != null && d.hit_count_ascension !== d.hit_count));
+  const r = mv.sc?.dmg;
+  const a = asc >= (r?.lvl ?? DMG_ASC);
+  let n = a && d.ascension != null ? d.ascension : d.normal;
+  if (asc >= DREAD && r) { if (r.dval != null) n = r.dval; if (r.dadd) n += r.dadd; }
+  const hits = asc >= DMG_ASC && d.hit_count_ascension != null ? d.hit_count_ascension : d.hit_count;
+  const changed = n !== d.normal || (hits || 1) !== (d.hit_count || 1);
   return { n, hits: hits || 1, changed, base: d.normal, baseHits: d.hit_count || 1 };
 }
+function blkOf(mv) { return mv.block == null && !mv.sc?.blk ? null : scVal(mv.sc?.blk, mv.block); }
 function innateAmt(p, asc = S.asc) {
+  if (p.sc) return scVal(p.sc, p.amount);
   return asc >= HP_ASC && p.amount_ascension != null ? p.amount_ascension : p.amount;
 }
 
@@ -157,7 +174,7 @@ function numsHtml(m, mv, str = 0) {
     const n = d.n + str;
     parts.push(`<span class="n-atk">${n}${d.hits > 1 ? '×' + d.hits : ''}</span>`);
   }
-  if (mv.block) parts.push(`<span class="n-blk">${mv.block}<small> blk</small></span>`);
+  { const b = blkOf(mv); if (b) parts.push(`<span class="n-blk">${b}<small> blk</small></span>`); }
   if (mv.heal) parts.push(`<span class="n-heal">+${mv.heal}</span>`);
   return parts.join(' ');
 }
@@ -265,10 +282,48 @@ function wireChips(root, rerender) {
     setUi(c.dataset.key, b.dataset.v); rerender();
   }));
 }
-function wireSearch(root, key, rerender) {
-  const i = root.querySelector('.search'); if (!i) return;
-  i.addEventListener('input', () => { setUi(key, i.value); rerender(true); });
+/* Search box with a clear (×) button and live suggestions as you type.
+   suggest(q) returns [{label, sub, href, img}]; an item without href fills the box instead. */
+function searchBox(key, ph) {
+  const v = ui(key, '');
+  return `<div class="sbox"><input class="search" type="text" inputmode="search" enterkeyhint="search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="${esc(ph)}" value="${esc(v)}"><button class="sclear" type="button" aria-label="Clear search"${v ? '' : ' hidden'}>×</button><div class="sugg" hidden></div></div>`;
 }
+function rank(list, q, nameOf) {
+  const n = norm(q); if (!n) return [];
+  return list.map(o => [o, norm(nameOf(o))]).filter(([, k]) => k.includes(n))
+    .sort((a, b) => (b[1].startsWith(n) - a[1].startsWith(n)) || (a[1].length - b[1].length)).map(([o]) => o);
+}
+function hl(label, q) {
+  const i = String(label).toLowerCase().indexOf(String(q).trim().toLowerCase());
+  if (i < 0 || !q.trim()) return esc(label);
+  const L = q.trim().length;
+  return esc(label.slice(0, i)) + '<b>' + esc(label.slice(i, i + L)) + '</b>' + esc(label.slice(i + L));
+}
+function wireSearch(root, key, rerender, suggest) {
+  const i = root.querySelector('.search'); if (!i) return;
+  const x = root.querySelector('.sclear'), box = root.querySelector('.sugg');
+  let items = [];
+  const show = () => {
+    const q = i.value;
+    items = q.trim() && suggest ? suggest(q).slice(0, 8) : [];
+    box.hidden = !items.length || document.activeElement !== i;
+    box.innerHTML = items.map((it, k) => `<a class="sg" data-k="${k}"${it.href ? ` href="${it.href}"` : ''}>${it.img ? imgTag(it.img, 'sgi') : ''}<span class="nm">${hl(it.label, q)}</span>${it.sub ? `<small>${esc(it.sub)}</small>` : ''}</a>`).join('');
+  };
+  const set = v => { i.value = v; setUi(key, v); x.hidden = !v; rerender(true); };
+  i.addEventListener('input', () => { setUi(key, i.value); x.hidden = !i.value; rerender(true); show(); });
+  i.addEventListener('focus', show);
+  i.addEventListener('blur', () => setTimeout(() => { box.hidden = true; }, 250));
+  i.addEventListener('keydown', e => { if (e.key === 'Enter') { box.hidden = true; i.blur(); } if (e.key === 'Escape') set(''); });
+  box.addEventListener('mousedown', e => e.preventDefault());
+  box.addEventListener('click', e => {
+    const a = e.target.closest('.sg'); if (!a) return;
+    const it = items[+a.dataset.k]; box.hidden = true;
+    if (!it.href) { e.preventDefault(); set(it.label); i.blur(); }
+  });
+  x.addEventListener('mousedown', e => e.preventDefault());
+  x.addEventListener('click', () => { set(''); box.hidden = true; i.focus(); });
+}
+const sgEnemy = m => ({ label: m.name, sub: `${m.type} · ${m.acts.join(', ') || 'Other'}`, href: '#/enemy/' + m.id, img: m.img });
 /* list pages render header once, then only the results, so typing keeps focus */
 function listPage(head, results) {
   const view = $('#view');
@@ -282,7 +337,7 @@ V.enemies = () => {
   const acts = ACT_ORDER.filter(a => D.monsters.some(m => m.acts.includes(a) || (a === 'Other' && !m.acts.length)));
   const page = () => {
     const { view, draw } = listPage(() => `
-      <input class="search" type="search" placeholder="Search enemies or moves" value="${esc(ui('eq', ''))}">
+      ${searchBox('eq', 'Search enemies or moves')}
       ${chips('eact', [['all', 'All acts'], ...acts.map(a => [a, a])], ui('eact', 'all'))}
       ${chips('etype', [['all', 'All'], ['Normal', 'Normal'], ['Elite', 'Elite'], ['Boss', 'Boss']], ui('etype', 'all'))}`, () => {
       const q = norm(ui('eq', '')), act = ui('eact', 'all'), ty = ui('etype', 'all');
@@ -292,12 +347,12 @@ V.enemies = () => {
         (!q || norm(m.name).includes(q) || (m.moves || []).some(x => norm(x.name).includes(q))));
       list.sort((a, b) => (ACT_ORDER.indexOf(a.acts[0] || 'Other') - ACT_ORDER.indexOf(b.acts[0] || 'Other')) || ((TYPE_ORDER[a.type] ?? 1) - (TYPE_ORDER[b.type] ?? 1)) || a.name.localeCompare(b.name));
       if (!list.length) return '<div class="empty">No enemies match.</div>';
-      return `<div class="count">${list.length} enemies · HP at A${S.asc}</div><div class="grid">${list.map(m => {
+      return `<div class="count">${list.length} enemies · HP at ${ascLabel(S.asc)}</div><div class="grid">${list.map(m => {
         const h = hpOf(m);
         return `<a class="tile" href="#/enemy/${m.id}"><div class="pic">${imgTag(m.img, '', m.name)}</div><div class="meta"><div class="name">${esc(m.name)}</div><div class="hp">❤ ${range(h.lo, h.hi)} · ${typeBadge(m.type)}</div><div class="hp">${m.acts.map(esc).join(', ') || 'Other'}</div></div></a>`;
       }).join('')}</div>`;
     });
-    wireChips(view, page); wireSearch(view, 'eq', draw); draw();
+    wireChips(view, page); wireSearch(view, 'eq', draw, q => rank(D.monsters, q, m => m.name).map(sgEnemy)); draw();
   };
   page();
 };
@@ -313,7 +368,7 @@ function enemyBlock(m, opts = {}) {
     const d = dmgOf(mv);
     const fx = [];
     if (d) fx.push(`<span class="fxp n-atk"><b>${d.n}${d.hits > 1 ? '×' + d.hits : ''}</b> dmg${d.changed ? ` <span class="was">A0: ${d.base}${d.baseHits > 1 ? '×' + d.baseHits : ''}</span>` : ''}</span>`);
-    if (mv.block) fx.push(`<span class="fxp n-blk"><b>${mv.block}</b> block</span>`);
+    { const b = blkOf(mv); if (b) fx.push(`<span class="fxp n-blk"><b>${b}</b> block${b !== mv.block ? ` <span class="was">A0: ${mv.block}</span>` : ''}</span>`); }
     if (mv.heal) fx.push(`<span class="fxp n-heal"><b>${mv.heal}</b> heal</span>`);
     for (const p of mv.powers || []) fx.push(`<span class="fxp">${esc(powName(p.power_id))} <b>${p.amount ?? ''}</b>${p.target === 'player' ? ' → you' : p.target === 'self' ? ' (self)' : p.target ? ' → ' + esc(p.target) : ''}</span>`);
     return `<div class="move"><div class="mh"><b>${esc(mv.name)}</b><span class="intent">${esc(mv.intent || '')}</span></div>${fx.length ? `<div class="fx">${fx.join('')}</div>` : ''}</div>`;
@@ -326,16 +381,49 @@ function enemyBlock(m, opts = {}) {
         ${opts.link ? `<a href="#/enemy/${m.id}"><h1>${esc(m.name)} ›</h1></a>` : `<h1>${esc(m.name)}</h1>`}
         <div>${typeBadge(m.type)} ${m.acts.map(actBadge).join(' ')}</div>
         <div class="stats">
-          <div class="stat"><b class="hp">${range(h.lo, h.hi)}</b><span>HP · A${S.asc}</span>${h.base ? `<div class="was">A0–7: ${range(h.base[0], h.base[1])}</div>` : ''}</div>
+          <div class="stat"><b class="hp">${range(h.lo, h.hi)}</b><span>HP · ${ascLabel(S.asc)}</span>${h.base ? `<div class="was">A0–${h.lvl - 1}: ${range(h.base[0], h.base[1])}${h.dread ? ` · Dread +${h.dread}` : ''}</div>` : ''}</div>
         </div>
       </div>
     </div>
     ${innate ? `<h2>Starts with</h2><div class="panel">${innate}</div>` : ''}
-    <h2>Pattern at A${S.asc}</h2>
+    ${dreadPanel(m)}
+    <h2>Pattern at ${ascLabel(S.asc)}</h2>
     ${renderPattern(m)}
     <h2>Moves</h2>
     ${moves || '<div class="note">No moves listed.</div>'}
+    ${extraPanel(m)}
     ${encs && encs.length ? `<h2>Appears in</h2>${encs.map(encRow).join('')}` : ''}`;
+}
+
+function extraPanel(m) {
+  const ex = m.sc?.extra || []; if (!ex.length) return '';
+  const row = r => {
+    const cur = scVal(r);
+    const bits = [];
+    if (r.lvl != null) bits.push(`${r.n} → ${r.a} at A${r.lvl}`);
+    if (r.dval != null) bits.push(`${r.n} → ${r.dval} in Dread`);
+    if (r.dadd) bits.push(`+${r.dadd} in Dread`);
+    return `<div class="row-between" style="padding:4px 0"><span>${esc(r.label)}</span><span><b>${cur}</b> <span class="was">${esc(bits.join(' · '))}</span></span></div>`;
+  };
+  return `<h2>Other values at ${ascLabel(S.asc)}</h2><div class="panel">${ex.map(row).join('')}</div>`;
+}
+/* Dread: normal/elite enemies gain the upcoming boss's Dominion; bosses are buffed (values above) */
+function dominionsFor(m) {
+  const D = S.D; if (!D.dread) return [];
+  const doms = D.dread.dominions || [];
+  if (m.type === 'Boss') return doms.filter(d => (m.encounters || []).includes(d.encounter_id));
+  const bosses = new Set((D.acts || []).filter(a => m.acts.includes(a.name)).flatMap(a => a.bosses || []));
+  return doms.filter(d => bosses.has(d.encounter_id));
+}
+function dreadPanel(m) {
+  if (!isDread()) return '';
+  const doms = dominionsFor(m);
+  if (!doms.length) return '';
+  const boss = m.type === 'Boss';
+  return `<h2>Dread</h2><div class="panel">${boss
+    ? '<div class="sub" style="margin-bottom:6px">Its Dominion: enemies earlier in the act gain this when it is the upcoming boss.</div>'
+    : `<div class="sub" style="margin-bottom:6px">Gains the upcoming boss's Dominion${doms.length > 1 ? ', one of:' : ':'}</div>`}
+    ${doms.map(d => `<div style="margin-top:6px"><b class="nm">${esc(d.name)}</b><div class="sub">${fmt(d.description)}</div></div>`).join('')}</div>`;
 }
 
 V.enemy = (id) => {
@@ -343,7 +431,7 @@ V.enemy = (id) => {
   if (!m) return notFound();
   $('#view').innerHTML = backBtn() + enemyBlock(m) + ascNote();
 };
-const ascNote = () => `<div class="note faint" style="margin-top:20px">HP uses ascension values from A${HP_ASC} (Tough Enemies); damage from A${DMG_ASC} (Deadly Enemies). Strength gained from its own moves is added to later turns; your Weak, Vulnerable and Block are not.</div>`;
+const ascNote = () => `<div class="note faint" style="margin-top:20px">Each value switches at the ascension level the game code uses (HP and block mostly at A8 Tough Enemies, damage at A9 Deadly Enemies). Dread adds the boss buffs read from the game code. Strength gained from its own moves is added to later turns; your Weak, Vulnerable and Block are not.</div>`;
 
 function encRow(e) {
   const D = S.D;
@@ -357,7 +445,7 @@ V.fights = () => {
   const acts = ACT_ORDER.filter(a => D.encounters.some(e => e.act === a));
   const page = () => {
     const { view, draw } = listPage(() => `
-      <input class="search" type="search" placeholder="Search fights or enemies" value="${esc(ui('fq', ''))}">
+      ${searchBox('fq', 'Search fights or enemies')}
       ${chips('fact', [['all', 'All acts'], ...acts.map(a => [a, a])], ui('fact', 'all'))}
       ${chips('froom', [['all', 'All'], ['Weak', 'Weak'], ['Normal', 'Normal'], ['Elite', 'Elite'], ['Boss', 'Boss']], ui('froom', 'all'))}`, () => {
       const q = norm(ui('fq', '')), act = ui('fact', 'all'), room = ui('froom', 'all');
@@ -376,7 +464,7 @@ V.fights = () => {
       }
       return h;
     });
-    wireChips(view, page); wireSearch(view, 'fq', draw); draw();
+    wireChips(view, page); wireSearch(view, 'fq', draw, q => [...rank(D.encounters, q, e => e.name).map(e => ({ label: e.name, sub: `${e.weak ? 'Weak' : e.room === 'Monster' ? 'Normal' : e.room} · ${e.act}`, href: '#/fight/' + e.id })), ...rank(D.monsters, q, m => m.name).map(sgEnemy)]); draw();
   };
   page();
 };
@@ -388,7 +476,7 @@ V.fight = (id) => {
   const label = e.weak ? 'Weak' : (e.room === 'Monster' ? 'Normal' : e.room);
   const total = ms.reduce((a, m) => { const h = hpOf(m); return [a[0] + (h.lo || 0), a[1] + (h.hi || h.lo || 0)]; }, [0, 0]);
   $('#view').innerHTML = backBtn() + `<h1>${esc(e.name)}</h1><div>${typeBadge(label)} ${actBadge(e.act)}</div>
-    <div class="stats"><div class="stat"><b class="hp">${range(total[0], total[1])}</b><span>Total HP · A${S.asc}</span></div><div class="stat"><b>${ms.length}</b><span>Enemies</span></div></div>
+    <div class="stats"><div class="stat"><b class="hp">${range(total[0], total[1])}</b><span>Total HP · ${ascLabel(S.asc)}</span></div><div class="stat"><b>${ms.length}</b><span>Enemies</span></div></div>
     ${ms.map(m => `<div class="fight-mon">${enemyBlock(m, { link: true, noEncounters: true })}</div>`).join('')}` + ascNote();
 };
 
@@ -402,6 +490,35 @@ function cardColors(D) {
   return order.filter(c => present.has(c));
 }
 const colorName = c => S.D.charNames[c] || title(c);
+// Frame colour per character / card group (in-game card frame colours, toned for a dark UI)
+const CARD_COLORS = { ironclad: '#c0392b', silent: '#4e9a3a', defect: '#2f7fc8', necrobinder: '#9a55c4', regent: '#e08a2a', fool: '#d4b02a',
+  colorless: '#9a958c', curse: '#6a2d63', status: '#7a6650', event: '#2c9c90', token: '#a07a52', quest: '#c79b3b' };
+const CHAR_FALLBACK = { red: '#c0392b', green: '#4e9a3a', blue: '#2f7fc8', purple: '#9a55c4', orange: '#e08a2a', yellow: '#d4b02a' };
+function cardColor(c) {
+  if (CARD_COLORS[c.color]) return CARD_COLORS[c.color];
+  const ch = (S.D.characters || []).find(x => x.id.toLowerCase() === c.color);
+  return CHAR_FALLBACK[ch?.color] || '#8a7f70';
+}
+/* Upgraded text with the numbers that changed shown in green, like the in-game upgrade preview */
+function upDiff(base, up) {
+  const num = /(\d+)/g;
+  const a = String(base || '').split(num), b = String(up || '').split(num);
+  if (a.length !== b.length) return fmt(up);
+  const mark = '\u0001', end = '\u0002';
+  const merged = b.map((t, i) => (i % 2 === 1 && t !== a[i]) ? mark + t + end : t).join('');
+  return fmt(merged).replace(/\u0001/g, '<span class="t-up">').replace(/\u0002/g, '</span>');
+}
+function gameCard(c, up) {
+  const art = S.branch === 'beta' && c.bimg ? c.bimg : c.img;
+  const text = up ? upDiff(c.desc, upText(c) || c.desc) : fmt(c.desc);
+  const shape = { Attack: 'atk', Power: 'pow' }[c.type] || 'skl';
+  return `<div class="gcard ${shape}" style="--cc:${cardColor(c)}">
+    <div class="gc-top">${costHtml(c, up)}<div class="gc-name nm${up && c.up ? ' upg' : ''}">${esc(c.name)}${up && c.up ? '+' : ''}</div></div>
+    <div class="gc-art">${imgTag(art, '', c.name)}</div>
+    <div class="gc-type"><span class="r-${esc(c.rarity)}">●</span> ${esc(c.type || '')}</div>
+    <div class="gc-text"><div>${text || "&nbsp;"}</div></div>
+  </div>`;
+}
 function costHtml(c, up) {
   let cost = c.cost, changed = false;
   if (up && c.up && c.up.cost != null) {
@@ -427,7 +544,7 @@ V.cards = () => {
   const D = S.D, colors = cardColors(D);
   const page = () => {
     const { view, draw } = listPage(() => `
-      <input class="search" type="search" placeholder="Search cards or text" value="${esc(ui('cq', ''))}">
+      ${searchBox('cq', 'Search cards or text')}
       ${chips('ccolor', [['all', 'All'], ...colors.map(c => [c, colorName(c)])], ui('ccolor', 'all'))}
       ${chips('ctype', [['all', 'Any type'], ...['Attack', 'Skill', 'Power', 'Status', 'Curse', 'Quest'].filter(t => D.cards.some(c => c.type === t)).map(t => [t, t])], ui('ctype', 'all'))}
       ${chips('crar', [['all', 'Any rarity'], ...['Basic', 'Common', 'Uncommon', 'Rare', 'Ancient', 'Event', 'Token'].filter(r => D.cards.some(c => c.rarity === r)).map(r => [r, r])], ui('crar', 'all'))}
@@ -439,10 +556,10 @@ V.cards = () => {
       if (!list.length) return '<div class="empty">No cards match.</div>';
       return `<div class="count">${list.length} cards</div><div class="list">${list.slice(0, 400).map(c => {
         const t = up ? (upText(c) || c.desc) : c.desc;
-        return `<a class="item" href="#/card/${c.id}">${costHtml(c, up)}<div class="body"><div class="title">${esc(c.name)}${up && c.up ? '<span class="t-up">+</span>' : ''} <span class="ctype"><span class="r-${esc(c.rarity)}">${esc(c.rarity || '')}</span> ${esc(c.type || '')}${col === 'all' ? ' · ' + esc(colorName(c.color)) : ''}</span></div><div class="desc">${fmt(t)}</div></div></a>`;
+        return `<a class="item cardrow" style="--cc:${cardColor(c)}" href="#/card/${c.id}">${costHtml(c, up)}<div class="body"><div class="title"><span class="nm">${esc(c.name)}</span>${up && c.up ? '<span class="t-up">+</span>' : ''} <span class="ctype"><span class="r-${esc(c.rarity)}">${esc(c.rarity || '')}</span> ${esc(c.type || '')}${col === 'all' ? ' · ' + esc(colorName(c.color)) : ''}</span></div><div class="desc">${fmt(t)}</div></div></a>`;
       }).join('')}</div>${list.length > 400 ? '<div class="note">Showing first 400. Narrow the filters to see more.</div>' : ''}`;
     });
-    wireChips(view, page); wireSearch(view, 'cq', draw);
+    wireChips(view, page); wireSearch(view, 'cq', draw, q => rank(D.cards, q, c => c.name).map(c => ({ label: c.name, sub: `${c.rarity || ''} ${c.type || ''} · ${colorName(c.color)}`, href: '#/card/' + c.id })));
     $('#upT').addEventListener('change', e => { setUi('cup', e.target.checked); draw(); });
     draw();
   };
@@ -453,16 +570,22 @@ V.card = (id) => {
   const D = S.D, c = D.C[id]; if (!c) return notFound();
   const ut = upText(c); const ex = upExtras(c);
   const evs = (c.events || []).map(e => D.EV[e]).filter(Boolean);
-  const art = S.branch === 'beta' && c.bimg ? c.bimg : c.img;
+  const canUp = !!(c.up || c.udesc);
+  const up = canUp && ui('cdup', false);
   $('#view').innerHTML = backBtn() + `
-    <div class="row-between"><div><h1>${esc(c.name)}</h1><div class="sub"><span class="r-${esc(c.rarity)}">${esc(c.rarity || '')}</span> ${esc(c.type || '')} · ${esc(colorName(c.color))}${c.target && c.target !== 'None' ? ' · targets ' + esc(c.target.replace(/([a-z])([A-Z])/g, '$1 $2').toLowerCase()) : ''}</div></div>${costHtml(c, false)}</div>
-    ${art ? `<div style="margin:14px 0">${imgTag(art, 'cardart', c.name)}</div>` : ''}
-    <div class="twocol">
-      <div class="panel"><h3>Base</h3>${fmt(c.desc)}</div>
-      <div class="panel up"><h3>Upgraded</h3>${c.up || ut ? fmt(ut || c.desc) : '<span class="muted">Can’t be upgraded</span>'}${ex.length ? `<div class="note">${ex.map(esc).join(' · ')}</div>` : ''}</div>
-    </div>
+    <div class="sub" style="text-align:center"><span class="r-${esc(c.rarity)}">${esc(c.rarity || '')}</span> ${esc(c.type || '')} · ${esc(colorName(c.color))}${c.target && c.target !== 'None' ? ' · targets ' + esc(c.target.replace(/([a-z])([A-Z])/g, '$1 $2').toLowerCase()) : ''}</div>
+    ${canUp ? `<div style="text-align:center;margin:10px 0 2px"><div class="seg" id="upSeg"><button data-u="0" class="${up ? '' : 'on'}">Base</button><button data-u="1" class="${up ? 'on' : ''}">Upgraded</button></div></div>` : '<div class="note" style="text-align:center">Can’t be upgraded</div>'}
+    <div id="gcWrap">${gameCard(c, up)}</div>
+    <div id="upNote" class="note" style="text-align:center">${up && ex.length ? ex.map(esc).join(' · ') : ''}</div>
     ${(c.kw || []).length ? `<h2>Keywords</h2><div class="panel">${c.kw.map(k => { const kk = (D.keywords || []).find(x => norm(x.name || x.id) === norm(k)); return `<div><b>${esc(k)}</b>${kk?.description ? ' <span class="sub">' + fmt(kk.description) + '</span>' : ''}</div>`; }).join('')}</div>` : ''}
     ${evs.length ? `<h2>From events</h2>${evs.map(evRow).join('')}` : ''}`;
+  $('#upSeg')?.addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    const u = b.dataset.u === '1'; setUi('cdup', u);
+    $('#upSeg').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
+    $('#gcWrap').innerHTML = gameCard(c, u);
+    $('#upNote').innerHTML = u && ex.length ? ex.map(esc).join(' · ') : '';
+  });
 };
 
 /* ---- relics ---- */
@@ -472,16 +595,16 @@ V.relics = () => {
   const pools = [...new Set(D.relics.map(r => r.pool).filter(Boolean))];
   const page = () => {
     const { view, draw } = listPage(() => `
-      <input class="search" type="search" placeholder="Search relics or text" value="${esc(ui('rq', ''))}">
+      ${searchBox('rq', 'Search relics or text')}
       ${chips('rrar', [['all', 'Any rarity'], ...rar.map(r => [r, r])], ui('rrar', 'all'))}
       ${chips('rpool', [['all', 'Any pool'], ...pools.map(p => [p, p === 'shared' ? 'Shared' : colorName(p)])], ui('rpool', 'all'))}`, () => {
       const q = norm(ui('rq', '')), ra = ui('rrar', 'all'), po = ui('rpool', 'all');
       const list = D.relics.filter(r => (ra === 'all' || r.rarity === ra) && (po === 'all' || r.pool === po) && (!q || norm(r.name).includes(q) || norm(strip(r.desc)).includes(q)))
         .sort((a, b) => (rar.indexOf(a.rarity) - rar.indexOf(b.rarity)) || a.name.localeCompare(b.name));
       if (!list.length) return '<div class="empty">No relics match.</div>';
-      return `<div class="count">${list.length} relics</div><div class="list">${list.map(r => `<a class="item" href="#/relic/${r.id}">${imgTag(r.img, 'ico', r.name)}<div class="body"><div class="title">${esc(r.name)} <span class="ctype r-${esc(r.rarity)}">${esc(r.rarity)}</span>${r.pool && r.pool !== 'shared' ? ` <span class="ctype">· ${esc(colorName(r.pool))}</span>` : ''}</div><div class="desc">${fmt(r.desc)}</div>${relicSource(r, true)}</div></a>`).join('')}</div>`;
+      return `<div class="count">${list.length} relics</div><div class="list">${list.map(r => `<a class="item" href="#/relic/${r.id}">${imgTag(r.img, 'ico', r.name)}<div class="body"><div class="title"><span class="nm">${esc(r.name)}</span> <span class="ctype r-${esc(r.rarity)}">${esc(r.rarity)}</span>${r.pool && r.pool !== 'shared' ? ` <span class="ctype">· ${esc(colorName(r.pool))}</span>` : ''}</div><div class="desc">${fmt(r.desc)}</div>${relicSource(r, true)}</div></a>`).join('')}</div>`;
     });
-    wireChips(view, page); wireSearch(view, 'rq', draw); draw();
+    wireChips(view, page); wireSearch(view, 'rq', draw, q => rank(D.relics, q, r => r.name).map(r => ({ label: r.name, sub: `${r.rarity}${r.pool && r.pool !== 'shared' ? ' · ' + colorName(r.pool) : ''}`, href: '#/relic/' + r.id, img: r.img }))); draw();
   };
   page();
 };
@@ -491,7 +614,7 @@ function relicSource(r, short) {
     const evs = (r.events || []).map(e => D.EV[e]).filter(Boolean);
     bits.push(evs.length ? 'From ' + evs.map(e => `${esc(e.name)}${e.acts?.length ? ' (' + esc(e.acts.join('/')) + ')' : ''}`).join(', ') : 'Event source not in the data yet');
   }
-  if (r.ancients?.length) bits.push('Offered by ' + r.ancients.map(a => `${esc(title(a))}${D.ancientActs[a] ? ' (' + esc(D.ancientActs[a].join('/')) + ')' : ''}`).join(', '));
+  if (r.ancients?.length) bits.push('Offered by ' + r.ancients.map(a => `${short ? esc(D.AN?.[a]?.name || title(a)) : `<a class="t-aqua" href="#/ancient/${a}">${esc(D.AN?.[a]?.name || title(a))}</a>`}${D.ancientActs[a] ? ' (' + esc(D.ancientActs[a].join('/')) + ')' : ''}`).join(', '));
   if (r.price) bits.push(`Shop ~${r.price}g`);
   return bits.length ? `<div class="foot">${bits.join(' · ')}</div>` : '';
 }
@@ -509,7 +632,7 @@ V.relic = (id) => {
 
 /* ---- events ---- */
 function evRow(e) {
-  return `<a class="item" href="#/event/${e.id}"><div class="body"><div class="title">${esc(e.name)} <span class="ctype">${esc((e.acts || []).join(' / ') || 'Any act')}</span></div></div><span class="faint">›</span></a>`;
+  return `<a class="item" href="#/event/${e.id}"><div class="body"><div class="title"><span class="nm">${esc(e.name)}</span> <span class="ctype">${esc((e.acts || []).join(' / ') || 'Any act')}</span></div></div><span class="faint">›</span></a>`;
 }
 V.events = () => {
   const D = S.D;
@@ -517,14 +640,14 @@ V.events = () => {
   const page = () => {
     const { view, draw } = listPage(() => `
       <h1>Events</h1>
-      <input class="search" type="search" placeholder="Search events" value="${esc(ui('vq', ''))}">
+      ${searchBox('vq', 'Search events')}
       ${chips('vact', [['all', 'All'], ...acts.map(a => [a, a]), ['none', 'Shared / other']], ui('vact', 'all'))}`, () => {
       const q = norm(ui('vq', '')), act = ui('vact', 'all');
       const list = D.events.filter(e => (act === 'all' || (act === 'none' ? !(e.acts || []).length : (e.acts || []).includes(act))) && (!q || norm(e.name).includes(q) || norm(strip(JSON.stringify(e.options || ''))).includes(q)))
         .sort((a, b) => a.name.localeCompare(b.name));
       return `<div class="count">${list.length} events</div><div class="list">${list.map(evRow).join('')}</div>`;
     });
-    wireChips(view, page); wireSearch(view, 'vq', draw); draw();
+    wireChips(view, page); wireSearch(view, 'vq', draw, q => rank(D.events, q, e => e.name).map(e => ({ label: e.name, sub: (e.acts || []).join(' / ') || 'Any act', href: '#/event/' + e.id }))); draw();
   };
   page();
 };
@@ -538,43 +661,46 @@ V.event = (id) => {
     ${e.pre ? `<div class="note">Requires: ${fmt(typeof e.pre === 'string' ? e.pre : JSON.stringify(e.pre))}</div>` : ''}
     ${(e.options || []).length ? `<h2>Options</h2>${e.options.map(opt).join('')}` : ''}
     ${(e.pages || []).filter(p => (p.options || []).length).map(p => `<h2>${esc(title(p.id))}</h2>${p.desc ? `<div class="note">${fmt(p.desc)}</div>` : ''}${p.options.map(opt).join('')}`).join('')}
-    ${relics.length ? `<h2>Relics</h2><div class="list">${relics.map(r => `<a class="item" href="#/relic/${r.id}">${imgTag(r.img, 'ico')}<div class="body"><div class="title">${esc(r.name)}</div><div class="desc">${fmt(r.desc)}</div></div></a>`).join('')}</div>` : ''}
-    ${cards.length ? `<h2>Cards</h2><div class="list">${cards.map(c => `<a class="item" href="#/card/${c.id}">${costHtml(c)}<div class="body"><div class="title">${esc(c.name)}</div><div class="desc">${fmt(c.desc)}</div></div></a>`).join('')}</div>` : ''}`;
+    ${relics.length ? `<h2>Relics</h2><div class="list">${relics.map(r => `<a class="item" href="#/relic/${r.id}">${imgTag(r.img, 'ico')}<div class="body"><div class="title"><span class="nm">${esc(r.name)}</span></div><div class="desc">${fmt(r.desc)}</div></div></a>`).join('')}</div>` : ''}
+    ${cards.length ? `<h2>Cards</h2><div class="list">${cards.map(c => `<a class="item" href="#/card/${c.id}">${costHtml(c)}<div class="body"><div class="title"><span class="nm">${esc(c.name)}</span></div><div class="desc">${fmt(c.desc)}</div></div></a>`).join('')}</div>` : ''}`;
 };
 
 /* ---- potions / powers / ascension / characters / patch ---- */
 V.potions = () => {
   const D = S.D;
   const page = () => {
-    const { view, draw } = listPage(() => `<h1>Potions</h1><input class="search" type="search" placeholder="Search potions" value="${esc(ui('pq', ''))}">`, () => {
+    const { view, draw } = listPage(() => `<h1>Potions</h1>${searchBox('pq', 'Search potions')}`, () => {
       const q = norm(ui('pq', ''));
       const ord = ['Common', 'Uncommon', 'Rare', 'Event', 'Token'];
       const list = D.potions.filter(p => !q || norm(p.name).includes(q) || norm(strip(p.desc)).includes(q)).sort((a, b) => ((ord.indexOf(a.rarity) + 9) % 9 - (ord.indexOf(b.rarity) + 9) % 9) || a.name.localeCompare(b.name));
-      return `<div class="count">${list.length} potions</div><div class="list">${list.map(p => `<div class="item">${imgTag(p.img, 'ico')}<div class="body"><div class="title">${esc(p.name)} <span class="ctype r-${esc(p.rarity)}">${esc(p.rarity || '')}</span>${p.pool && !['shared', 'event'].includes(p.pool) ? ` <span class="ctype">· ${esc(colorName(p.pool))}</span>` : ''}</div><div class="desc">${fmt(p.desc)}</div></div></div>`).join('')}</div>`;
+      return `<div class="count">${list.length} potions</div><div class="list">${list.map(p => `<div class="item">${imgTag(p.img, 'ico')}<div class="body"><div class="title"><span class="nm">${esc(p.name)}</span> <span class="ctype r-${esc(p.rarity)}">${esc(p.rarity || '')}</span>${p.pool && !['shared', 'event'].includes(p.pool) ? ` <span class="ctype">· ${esc(colorName(p.pool))}</span>` : ''}</div><div class="desc">${fmt(p.desc)}</div></div></div>`).join('')}</div>`;
     });
-    wireSearch(view, 'pq', draw); draw();
+    wireSearch(view, 'pq', draw, q => rank(D.potions, q, p => p.name).map(p => ({ label: p.name, sub: p.rarity, img: p.img }))); draw();
   };
   page();
 };
 V.powers = () => {
   const D = S.D;
   const page = () => {
-    const { view, draw } = listPage(() => `<h1>Powers &amp; keywords</h1><input class="search" type="search" placeholder="Search buffs, debuffs, keywords" value="${esc(ui('wq', ''))}">
+    const { view, draw } = listPage(() => `<h1>Powers &amp; keywords</h1>${searchBox('wq', 'Search buffs, debuffs, keywords')}
       ${chips('wtype', [['all', 'All'], ['Buff', 'Buffs'], ['Debuff', 'Debuffs'], ['kw', 'Card keywords']], ui('wtype', 'all'))}`, () => {
       const q = norm(ui('wq', '')), ty = ui('wtype', 'all');
-      if (ty === 'kw') return `<div class="list">${(D.keywords || []).map(k => `<div class="item"><div class="body"><div class="title">${esc(k.name || k.id)}</div><div class="desc">${fmt(k.description || '')}</div></div></div>`).join('')}</div>`;
+      if (ty === 'kw') return `<div class="list">${(D.keywords || []).map(k => `<div class="item"><div class="body"><div class="title"><span class="nm">${esc(k.name || k.id)}</span></div><div class="desc">${fmt(k.description || '')}</div></div></div>`).join('')}</div>`;
       const list = D.powers.filter(p => (ty === 'all' || p.type === ty) && (!q || norm(p.name).includes(q) || norm(strip(p.desc)).includes(q))).sort((a, b) => a.name.localeCompare(b.name));
-      return `<div class="count">${list.length} powers</div><div class="list">${list.map(p => `<div class="item">${imgTag(p.img, 'ico')}<div class="body"><div class="title">${esc(p.name)} <span class="ctype">${esc(p.type || '')}</span></div><div class="desc">${fmt(p.desc)}</div></div></div>`).join('')}</div>`;
+      return `<div class="count">${list.length} powers</div><div class="list">${list.map(p => `<div class="item">${imgTag(p.img, 'ico')}<div class="body"><div class="title"><span class="nm">${esc(p.name)}</span> <span class="ctype">${esc(p.type || '')}</span></div><div class="desc">${fmt(p.desc)}</div></div></div>`).join('')}</div>`;
     });
-    wireChips(view, page); wireSearch(view, 'wq', draw); draw();
+    wireChips(view, page); wireSearch(view, 'wq', draw, q => [...rank(D.powers, q, p => p.name).map(p => ({ label: p.name, sub: p.type, img: p.img })), ...rank(D.keywords || [], q, k => k.name || k.id).map(k => ({ label: k.name || k.id, sub: 'Card keyword' }))]); draw();
   };
   page();
 };
 V.ascension = () => {
   const D = S.D;
   $('#view').innerHTML = backBtn() + `<h1>Ascension</h1><div class="sub">Tap a level to set it for enemy stats. Each level includes every level below it.</div>
-    <div class="list">${D.ascensions.map(a => `<button class="item" data-a="${a.level}" style="text-align:left;cursor:pointer;${a.level === S.asc ? 'border-color:var(--accent)' : ''}"><div class="cost ${a.level <= S.asc ? '' : 'none'}">${a.level}</div><div class="body"><div class="title">${esc(a.name)}${a.level === HP_ASC ? ' <span class="badge">enemy HP up</span>' : ''}${a.level === DMG_ASC ? ' <span class="badge">enemy damage up</span>' : ''}</div><div class="desc">${fmt(a.desc)}</div></div></button>`).join('')}</div>`;
+    ${D.dread ? `<button class="item" id="dreadBtn" style="text-align:left;cursor:pointer;margin-top:12px;${isDread() ? 'border-color:var(--accent)' : ''}"><div class="cost ${isDread() ? '' : 'none'}">D</div><div class="body"><div class="title"><span class="nm">Dread</span> <span class="badge">beta</span></div><div class="desc">${fmt(D.dread.intro || D.dread.desc)}</div>${(D.dread.rules || []).map((r, i) => `<div class="foot">${i + 1}. ${fmt(r)}</div>`).join('')}</div></button>
+      <h2>Dominions</h2><div class="list">${(D.dread.dominions || []).map(d => `<div class="item"><div class="body"><div class="title"><span class="nm">${esc(d.name)}</span></div><div class="desc">${fmt(d.description)}</div></div></div>`).join('')}</div><h2>Ascension levels</h2>` : ''}
+    <div class="list">${D.ascensions.map(a => `<button class="item" data-a="${a.level}" style="text-align:left;cursor:pointer;${a.level === S.asc && !isDread() ? 'border-color:var(--accent)' : ''}"><div class="cost ${a.level <= S.asc ? '' : 'none'}">${a.level}</div><div class="body"><div class="title"><span class="nm">${esc(a.name)}</span>${a.level === HP_ASC ? ' <span class="badge">enemy HP up</span>' : ''}${a.level === DMG_ASC ? ' <span class="badge">enemy damage up</span>' : ''}</div><div class="desc">${fmt(a.desc)}</div></div></button>`).join('')}</div>`;
   $('#view').querySelectorAll('[data-a]').forEach(b => b.addEventListener('click', () => setAsc(+b.dataset.a)));
+  $('#dreadBtn')?.addEventListener('click', () => setAsc(DREAD));
 };
 V.characters = () => {
   const D = S.D;
@@ -582,7 +708,7 @@ V.characters = () => {
   const rn = id => { const r = D.R[id.replace(/([a-z])([A-Z])/g, '$1_$2').toUpperCase()] || D.relicByName[norm(id)]; return r ? `<a href="#/relic/${r.id}" class="t-gold">${esc(r.name)}</a>` : esc(id); };
   $('#view').innerHTML = backBtn() + `<h1>Characters</h1>${D.characters.map(c => {
     const deck = {}; (c.deck || []).forEach(x => { const n = cn(x); deck[n] = (deck[n] || 0) + 1; });
-    return `<div class="panel" style="margin-top:10px"><h3>${esc(c.name)}</h3><div class="sub">${fmt(c.desc)}</div>
+    return `<div class="panel" style="margin-top:10px"><h3 class="nm">${esc(c.name)}</h3><div class="sub">${fmt(c.desc)}</div>
       <div class="stats"><div class="stat"><b class="hp">${c.hp}</b><span>HP</span></div><div class="stat"><b>${c.gold}</b><span>Gold</span></div><div class="stat"><b>${c.energy}</b><span>Energy</span></div>${c.orbs ? `<div class="stat"><b>${c.orbs}</b><span>Orb slots</span></div>` : ''}</div>
       <div class="note">Starting relic: ${(c.relics || []).map(rn).join(', ')}</div>
       <div class="note">Deck: ${Object.entries(deck).map(([n, k]) => `${k}× ${esc(n)}`).join(', ')}</div></div>`;
@@ -601,13 +727,71 @@ V.patch = () => {
       ${(c.removed || []).length ? `<div class="t-red"><b>Removed</b></div><ul class="changes">${c.removed.map(x => `<li>${esc(x.name || x.id)}</li>`).join('')}</ul>` : ''}
       ${(c.changed || []).length ? `<div class="t-gold"><b>Changed</b></div><ul class="changes">${c.changed.map(item).join('')}</ul>` : ''}</div>`).join('')}`;
 };
+V.ancients = () => {
+  const D = S.D;
+  $('#view').innerHTML = backBtn() + `<h1>Ancients</h1><div class="sub">Ancients appear at the start of each act and offer a choice of relics.</div>
+    <div class="list">${(D.ancients || []).sort((a, b) => ACT_ORDER.indexOf(a.acts?.[0]) - ACT_ORDER.indexOf(b.acts?.[0]) || a.name.localeCompare(b.name)).map(a =>
+      `<a class="item" href="#/ancient/${a.id}"><div class="body"><div class="title"><span class="nm">${esc(a.name)}</span> <span class="ctype">${esc((a.acts || []).join(' / ') || 'Special')}</span></div><div class="foot">${(a.relics || []).length} relics in its pool</div></div><span class="faint">›</span></a>`).join('')}</div>`;
+};
+V.ancient = (id) => {
+  const D = S.D, a = D.AN?.[id]; if (!a) return notFound();
+  const rs = (a.relics || []).map(r => D.R[r]).filter(Boolean);
+  $('#view').innerHTML = backBtn() + `<h1>${esc(a.name)}</h1><div>${(a.acts || []).map(actBadge).join(' ') || '<span class="badge">Special</span>'}</div>
+    ${a.desc ? `<div class="panel" style="margin-top:12px">${fmt(a.desc)}</div>` : ''}
+    ${rs.length ? `<h2>Relic pool (${rs.length})</h2><div class="list">${rs.map(r => `<a class="item" href="#/relic/${r.id}">${imgTag(r.img, 'ico', r.name)}<div class="body"><div class="title"><span class="nm">${esc(r.name)}</span>${r.pool && r.pool !== 'shared' ? ` <span class="ctype">· ${esc(colorName(r.pool))}</span>` : ''}</div><div class="desc">${fmt(r.desc)}</div></div></a>`).join('')}</div>` : ''}`;
+};
+V.enchantments = () => {
+  const D = S.D;
+  const page = () => {
+    const { view, draw } = listPage(() => `<h1>Enchantments</h1><div class="sub" style="margin-bottom:8px">Permanent modifiers some events, relics and cards put on cards in your deck.</div>${searchBox('nq', 'Search enchantments')}`, () => {
+      const q = norm(ui('nq', ''));
+      const list = (D.enchantments || []).filter(x => !q || norm(x.name).includes(q) || norm(strip(x.desc)).includes(q)).sort((a, b) => a.name.localeCompare(b.name));
+      return `<div class="count">${list.length} enchantments</div><div class="list">${list.map(x => `<div class="item">${imgTag(x.img, 'ico', x.name)}<div class="body"><div class="title"><span class="nm">${esc(x.name)}</span>${x.cardType ? ` <span class="ctype">${esc(x.cardType)}s only</span>` : ''}${x.stack ? ' <span class="ctype">· stacks</span>' : ''}</div><div class="desc">${fmt(x.desc)}</div>${x.extra ? `<div class="foot">Card text: ${fmt(x.extra)}</div>` : ''}${x.applies ? `<div class="foot">Applies to: ${esc(Array.isArray(x.applies) ? x.applies.join(', ') : x.applies)}</div>` : ''}</div></div>`).join('')}</div>`;
+    });
+    wireSearch(view, 'nq', draw, q => rank(D.enchantments || [], q, x => x.name).map(x => ({ label: x.name, sub: x.cardType ? x.cardType + 's only' : 'Enchantment', img: x.img })));
+    draw();
+  };
+  page();
+};
+/* Neowsletter: Mega Crit's monthly Steam post, fetched by the data Action into data/news.json */
+let NEWS = null;
+async function loadNews() {
+  if (NEWS) return NEWS;
+  NEWS = await (await fetch('data/news.json?h=' + encodeURIComponent(S.meta?.news?.updated || ''))).json();
+  return NEWS;
+}
+function bbcode(src) {
+  let h = esc(src || '');
+  h = h.replace(/\[img\]\{STEAM_CLAN_IMAGE\}\/([^\[]+)\[\/img\]/g, (_, p) => `<img class="nimg" loading="lazy" src="https://clan.akamai.steamstatic.com/images/${p}">`);
+  h = h.replace(/\[img(?:=[^\]]*)?\](https?:[^\[]+)\[\/img\]/g, (_, u) => `<img class="nimg" loading="lazy" src="${u}">`);
+  h = h.replace(/\[previewyoutube=([\w-]+)[^\]]*\]\[\/previewyoutube\]/g, (_, id) => `<a class="t-gold" href="https://www.youtube.com/watch?v=${id}" target="_blank" rel="noopener">▶ Watch on YouTube</a>`);
+  h = h.replace(/\[url=(?:&quot;)?([^\]]+?)(?:&quot;)?\]([\s\S]*?)\[\/url\]/g, (_, u, t) => `<a class="t-gold" href="${u}" target="_blank" rel="noopener">${t}</a>`);
+  h = h.replace(/\[h1\]([\s\S]*?)\[\/h1\]/g, '<h3 class="nm nh">$1</h3>').replace(/\[h2\]([\s\S]*?)\[\/h2\]/g, '<h3 class="nm nh">$1</h3>').replace(/\[h3\]([\s\S]*?)\[\/h3\]/g, '<h4>$1</h4>');
+  h = h.replace(/\[(\/?)(b|i|u)\]/g, '<$1$2>').replace(/\[hr\]\[\/hr\]|\[hr\]/g, '<hr>');
+  h = h.replace(/\[list\]|\[olist\]/g, '<ul>').replace(/\[\/list\]|\[\/olist\]/g, '</ul>').replace(/\[\*\]([^\n\[]*)/g, '<li>$1</li>');
+  h = h.replace(/\[\/?[a-z0-9]+(?:=[^\]]*)?\]/g, '');
+  return h.replace(/\n{3,}/g, '\n\n').replace(/\n/g, '<br>');
+}
+V.news = async () => {
+  $('#view').innerHTML = backBtn() + '<div class="loading">Loading the Neowsletter…</div>';
+  let n; try { n = await loadNews(); } catch { $('#view').innerHTML = backBtn() + '<div class="empty">Couldn’t load the Neowsletter.</div>'; return; }
+  const L = n.latest; if (!L) { $('#view').innerHTML = backBtn() + '<div class="empty">No Neowsletter found.</div>'; return; }
+  const date = t => new Date(t * 1000).toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' });
+  $('#view').innerHTML = backBtn() + `<h1>${esc(L.title)}</h1><div class="sub">${date(L.date)} · <a class="t-gold" href="${esc(L.url)}" target="_blank" rel="noopener">Open on Steam</a></div>
+    <div class="panel news" style="margin-top:12px">${bbcode(L.body)}</div>
+    ${(n.past || []).length ? `<h2>Earlier Neowsletters</h2><div class="list">${n.past.map(p => `<a class="item" href="${esc(p.url)}" target="_blank" rel="noopener"><div class="body"><div class="title"><span class="nm">${esc(p.title)}</span></div><div class="foot">${date(p.date)}</div></div><span class="faint">↗</span></a>`).join('')}</div>` : ''}`;
+};
+
 V.more = () => {
   const D = S.D, m = S.meta?.[S.branch] || {};
   $('#view').innerHTML = `<h1>More</h1><div class="morelist" style="margin-top:12px">
+    <a href="#/news">The Neowsletter <span>${esc((S.meta?.news?.latest || '').replace(/^The Neowsletter - /, '')) || 'Latest'} ›</span></a>
     <a href="#/events">Events <span>${D.events.length} ›</span></a>
+    <a href="#/ancients">Ancients <span>${(D.ancients || []).length} ›</span></a>
+    <a href="#/enchantments">Enchantments <span>${(D.enchantments || []).length} ›</span></a>
     <a href="#/potions">Potions <span>${D.potions.length} ›</span></a>
     <a href="#/powers">Powers &amp; keywords <span>${D.powers.length} ›</span></a>
-    <a href="#/ascension">Ascension levels <span>A${S.asc} ›</span></a>
+    <a href="#/ascension">Ascension levels <span>${ascLabel(S.asc)} ›</span></a>
     <a href="#/characters">Characters <span>${D.characters.length} ›</span></a>
     <a href="#/patch">Latest patch changes <span>v${esc(D.version)} ›</span></a>
   </div>
@@ -615,7 +799,7 @@ V.more = () => {
     <div><b>Main</b>: v${esc(S.meta?.main?.version || '?')} · updated ${esc(S.meta?.main?.updated || '?')}</div>
     <div><b>Beta</b>: v${esc(S.meta?.beta?.version || '?')} · updated ${esc(S.meta?.beta?.updated || '?')}</div>
     <div class="note">Checked every few hours against <a class="t-gold" href="https://spire-codex.com" target="_blank" rel="noopener">Spire Codex</a>, which extracts each patch from the game files. Enemy, card and relic images are served by Spire Codex. Game content © Mega Crit.</div>
-    <div class="note">Enemy HP uses ascension values from A${HP_ASC}, damage from A${DMG_ASC}.</div>
+    <div class="note">Ascension levels for each enemy value, Dread buffs and event relic sources are read from the game files on Vig’s Mac whenever Steam updates the game.</div>
   </div>`;
 };
 
@@ -624,7 +808,7 @@ function notFound() { $('#view').innerHTML = backBtn() + `<div class="empty">Not
 
 /* ---------------- shell ---------------- */
 function setAsc(a) {
-  const max = Math.max(...(S.D?.ascensions || [{ level: 10 }]).map(x => x.level));
+  const max = Math.max(...(S.D?.ascensions || [{ level: 10 }]).map(x => x.level)) + (S.D?.dread ? 1 : 0);
   S.asc = Math.max(0, Math.min(max, a)); store.set('asc', S.asc);
   paintHeader(); route(true);
 }
@@ -636,7 +820,9 @@ async function setBranch(b) {
 }
 function paintHeader() {
   document.querySelectorAll('#branch button').forEach(x => x.classList.toggle('on', x.dataset.b === S.branch));
-  $('#ascVal').textContent = 'A' + S.asc;
+  if (S.D && S.asc >= DREAD && !S.D.dread) S.asc = DREAD - 1;
+  $('#ascVal').textContent = S.asc >= DREAD ? 'Dread' : 'A' + S.asc;
+  $('#ascVal').classList.toggle('dread', S.asc >= DREAD);
   $('#ascVal').classList.toggle('hot', S.asc >= HP_ASC);
   const m = S.meta?.[S.branch];
   $('#ver').textContent = m ? `v${m.version}` : '';

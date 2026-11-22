@@ -85,7 +85,7 @@ def act_of(label, enc_id=''):
     return 'Event' if 'EVENT' in enc_id else 'Other'
 
 
-def build(folder, pools_path):
+def build(folder, pools_path, branch_name):
     acts = load(folder, 'acts')
     act_names = {a['id']: a['name'] for a in acts}
     act_index = {a['name']: a['index'] for a in acts}
@@ -96,7 +96,10 @@ def build(folder, pools_path):
         for an in a.get('ancients') or []:
             ancient_acts.setdefault(an, []).append(a['name'])
 
-    events_raw = load(folder, 'events')
+    ancient_ids = {an for a in acts for an in a.get('ancients') or []}
+    all_events = load(folder, 'events')
+    ancients_raw = [e for e in all_events if e.get('type') == 'Ancient' or e['id'] in ancient_ids]
+    events_raw = [e for e in all_events if e not in ancients_raw]
     events = []
     for e in events_raw:
         acts_for = event_acts.get(e['id']) or ([] if not e.get('act') else
@@ -110,8 +113,7 @@ def build(folder, pools_path):
     event_text = {e['id']: '\n'.join(strings(e)) for e in events_raw}
 
     event_ids = {e['id'] for e in events_raw}
-    ancient_ids = {an for a in acts for an in a.get('ancients') or []}
-    # Links read from the game's code by tools/event_sources.py (covers relics the event text never names)
+    # Links read from the game's code by tools/game_code.py (covers relics the event text never names)
     code = {}
     sp = os.path.join(OUT, 'event_sources.json')
     if os.path.exists(sp):
@@ -183,6 +185,23 @@ def build(folder, pools_path):
             'img': img(m.get('image_url')),
         })
 
+    apply_game_code(monsters, branch_name)
+
+    ancients = []
+    pools = {p['id']: p for p in json.load(open(pools_path, encoding='utf-8'))} if pools_path and os.path.exists(pools_path) else {}
+    for e in ancients_raw:
+        p = pools.get(e['id'], {})
+        pcr = p.get('per_character_relics') or []
+        ancients.append({'id': e['id'], 'name': e['name'], 'acts': ancient_acts.get(e['id'], []), 'desc': e.get('description'),
+                         'relics': (p.get('relics') or []) + (sum(pcr.values(), []) if isinstance(pcr, dict) else pcr)})
+
+    enchantments = [{'id': x['id'], 'name': x['name'], 'desc': x.get('description'), 'extra': x.get('extra_card_text'),
+                     'cardType': x.get('card_type'), 'applies': x.get('applicable_to'), 'stack': x.get('is_stackable'),
+                     'img': img(x.get('image_url'))} for x in load(folder, 'enchantments')]
+    modes = load(folder, 'game_modes')
+    dread = next(({'desc': m.get('description'), 'intro': m.get('intro'), 'rules': m.get('rules'),
+                   'unlock': m.get('unlock_info'), 'dominions': m.get('dominions')} for m in modes if m['id'] == 'DREAD'), None)
+
     powers = [{'id': p['id'], 'name': p['name'], 'type': p.get('type'), 'desc': p.get('description'),
                'img': img(p.get('image_url'))} for p in load(folder, 'powers')]
     potions = [{'id': p['id'], 'name': p['name'], 'rarity': p.get('rarity_key') or p.get('rarity'), 'pool': p.get('pool'),
@@ -201,7 +220,91 @@ def build(folder, pools_path):
         'ascensions': ascensions, 'characters': characters, 'cards': cards, 'relics': relics,
         'monsters': monsters, 'encounters': encounters, 'events': events, 'powers': powers,
         'potions': potions, 'keywords': keywords, 'intents': intents,
+        'ancients': ancients, 'enchantments': enchantments, 'dread': dread,
     })
+
+
+def camel_words(s):
+    return re.sub(r'(?<=[a-z0-9])(?=[A-Z])', ' ', s)
+
+
+def apply_game_code(monsters, branch):
+    """Merge data/monster_code.json (read from sts2.dll by tools/game_code.py): exact ascension
+    level per value and Dread mode changes. The dll is whichever branch the Mac has installed, so a
+    monster's record is only used when its numbers agree with this branch's Codex data."""
+    p = os.path.join(OUT, 'monster_code.json')
+    if not os.path.exists(p):
+        return
+    allcode = json.load(open(p, encoding='utf-8'))
+    nk = lambda x: re.sub(r'[^a-z0-9]', '', str(x).lower())
+    for m in monsters:
+        code = allcode.get(m['id'])
+        if not code:
+            continue
+        moves = m.get('moves') or []
+        sc, extra, ok = {}, [], True
+        for prop, r in sorted(code.items()):
+            if prop in ('MinInitialHp', 'MaxInitialHp'):
+                if 'lvl' in r and r['n'] not in (m['hp'][0], m['hp'][1]):
+                    ok = False
+                if prop == 'MinInitialHp':
+                    sc['hp'] = {k: r[k] for k in ('lvl', 'dadd') if k in r}
+                continue
+            target = None
+            for suf, field in (('Damage', 'dmg'), ('Block', 'blk'), ('Heal', 'heal')):
+                if prop.endswith(suf) and prop != suf:
+                    base = nk(prop[:-len(suf)])
+                    target = next((i for i, mv in enumerate(moves) if nk(mv['id']) == base or nk(mv.get('name')) == base), None)
+                    if target is None and 'lvl' in r:
+                        def val(mv):
+                            d = mv.get('damage') or {}
+                            return (d.get('normal'), d.get('ascension')) if field == 'dmg' else (mv.get('block'), None) if field == 'blk' else (mv.get('heal'), None)
+                        hits = [i for i, mv in enumerate(moves) if val(mv)[0] == r['n'] and val(mv)[1] in (None, r['a'])]
+                        target = hits[0] if len(hits) == 1 else None
+                    if target is not None:
+                        mv = moves[target]
+                        if field == 'dmg':
+                            d = mv.get('damage')
+                            if not d:
+                                mv['damage'] = {'normal': r['n'], 'ascension': r.get('a')}
+                            elif d.get('normal') != r['n']:
+                                ok = False
+                        mv.setdefault('sc', {})[field] = {k: r[k] for k in ('lvl', 'a', 'n', 'dadd', 'dval') if k in r}
+                    break
+            if target is not None:
+                continue
+            ip = next((x for x in (m.get('innate') or []) if nk(x['power_id']) == nk(re.sub(r'(Amount|Amt)$', '', prop))), None)
+            if ip is not None:
+                if 'lvl' in r and ip.get('amount') not in (None, r['n']):
+                    ok = False
+                ip['sc'] = {k: r[k] for k in ('lvl', 'a', 'n', 'dadd', 'dval') if k in r}
+                continue
+            extra.append(dict({'label': camel_words(re.sub(r'(Amt)$', 'Amount', prop))}, **{k: r[k] for k in ('lvl', 'a', 'n', 'dadd', 'dval') if k in r}))
+        if not ok and branch == 'main':
+            for mv in moves:
+                mv.pop('sc', None)
+            for ip in m.get('innate') or []:
+                ip.pop('sc', None)
+            continue
+        if extra:
+            sc['extra'] = extra
+        if sc:
+            m['sc'] = sc
+
+
+def fetch_news():
+    """Mega Crit's monthly Neowsletter, from Steam's public news feed (no CORS, so fetched here)."""
+    import urllib.request
+    url = 'https://api.steampowered.com/ISteamNews/GetNewsForApp/v2/?appid=2868840&count=100&maxlength=0&feeds=steam_community_announcements&format=json'
+    try:
+        items = json.load(urllib.request.urlopen(urllib.request.Request(url, headers={'User-Agent': 'spire-buddy-data'}), timeout=30))['appnews']['newsitems']
+    except Exception as e:
+        print('news fetch failed:', e)
+        return None
+    neo = [n for n in items if 'neowsletter' in n['title'].lower()]
+    neo.sort(key=lambda n: -n['date'])
+    clean = lambda n: {'title': n['title'], 'date': n['date'], 'url': n['url'], 'gid': n['gid']}
+    return {'latest': dict(clean(neo[0]), body=neo[0]['contents']) if neo else None, 'past': [clean(n) for n in neo[1:]]}
 
 
 def changelog(folder):
@@ -240,7 +343,7 @@ def main():
         ('main', os.path.join(src, 'data', 'eng'), os.path.join(src, 'data', 'ancient_pools_parsed.json'), main_ver, main_cl),
         ('beta', os.path.join(src, 'data-beta', beta_ver, 'eng'), os.path.join(src, 'data-beta', beta_ver, 'ancient_pools_parsed.json'), beta_ver.lstrip('v'), beta_cl),
     ]:
-        bundle = build(folder, pools)
+        bundle = build(folder, pools, branch)
         bundle['version'] = ver
         bundle['changelog'] = cl
         if write_if_changed(os.path.join(OUT, branch + '.json'), bundle):
@@ -250,6 +353,10 @@ def main():
         meta[branch]['counts'] = {k: len(bundle.get(k, [])) for k in ('cards', 'relics', 'monsters', 'encounters', 'events', 'potions')}
         h = hashlib.sha1(open(os.path.join(OUT, branch + '.json'), 'rb').read()).hexdigest()[:10]
         meta[branch]['hash'] = h
+    news = fetch_news()
+    if news is not None and write_if_changed(os.path.join(OUT, 'news.json'), news):
+        changed.append('news')
+        meta['news'] = {'updated': today, 'latest': (news.get('latest') or {}).get('title')}
     if changed:
         meta['source_commit'] = commit
     write_if_changed(meta_path, meta)

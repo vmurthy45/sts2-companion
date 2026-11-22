@@ -1,4 +1,4 @@
-# Spire Companion
+# Spire Buddy
 
 A phone-first Slay the Spire 2 reference, installable to the iPhone home screen.
 
@@ -15,17 +15,19 @@ A phone-first Slay the Spire 2 reference, installable to the iPhone home screen.
 (`data/eng` for main, `data-beta/latest` for the Steam public beta) and writes `data/main.json`, `data/beta.json`, `data/meta.json`.
 A GitHub Action runs it every 3 hours and commits only when a patch changed something.
 
-`tools/event_sources.py` reads the installed game's `sts2.dll` to find which event grants which relic/card
-(many event relics are only granted in code, not named in event text). It writes `data/event_sources.json`,
-which `build_data.py` merges in. A launchd agent on the Mac (`com.spirecompanion.eventsources`, working copy in
-`~/Library/Application Support/sts2-companion-sync/`) re-runs it whenever Steam updates the game, daily and at login,
-and pushes the file when it changes; that push triggers the Action. Manual run: `pip install dnfile && python3 tools/event_sources.py`.
+`tools/game_code.py` reads the installed game's `sts2.dll` for things Spire Codex doesn't have: which event grants
+which relic/card (`data/event_sources.json`; many are only granted in code), and the exact ascension level and
+Dread-mode value of every monster number (`data/monster_code.json`). `build_data.py` merges both in.
+A launchd agent on the Mac (`com.spirecompanion.eventsources`, working copy in `~/Library/Application Support/sts2-companion-sync/`)
+re-runs it whenever Steam updates the game, daily and at login, and pushes when anything changed; that push triggers the Action.
+Manual run: `pip install dnfile && python3 tools/game_code.py`.
 
-Images are loaded from the Spire Codex CDN and cached by the service worker. Game content © Mega Crit.
+The Action also pulls the latest Neowsletter from Steam's news feed into `data/news.json`.
 
 ## Ascension scaling
 
-HP uses the ascension values from A8 (Tough Enemies); attack damage and hit counts from A9 (Deadly Enemies).
+Each value switches at the level the game code uses (HP and block mostly A8, damage A9).
+Past A10 the stepper reaches **Dread** (beta only): the boss buffs from the game code, plus each enemy's Dominion.
 
 ## Local preview
 

@@ -1,0 +1,2227 @@
+{
+ "AEONGLASS": {
+  "EbbDamage": {
+   "a": 26,
+   "lvl": 9,
+   "n": 22
+  },
+  "EyeLasersDamage": {
+   "a": 12,
+   "lvl": 9,
+   "n": 11
+  },
+  "IncreasingIntensityBaseStrength": {
+   "a": 4,
+   "lvl": 9,
+   "n": 3
+  },
+  "MinInitialHp": {
+   "a": 535,
+   "lvl": 8,
+   "n": 512
+  },
+  "WitherAmount": {
+   "a": 2,
+   "dadd": 1,
+   "lvl": 9,
+   "n": 1
+  }
+ },
+ "ASSASSIN_RUBY_RAIDER": {
+  "KillshotDamage": {
+   "a": 11,
+   "lvl": 9,
+   "n": 10
+  },
+  "MaxInitialHp": {
+   "a": 24,
+   "lvl": 8,
+   "n": 23
+  },
+  "MinInitialHp": {
+   "a": 19,
+   "lvl": 8,
+   "n": 18
+  }
+ },
+ "AXEBOT": {
+  "BootUpBlock": {
+   "a": 15,
+   "lvl": 9,
+   "n": 10
+  },
+  "BootUpStrGain": {
+   "a": 4,
+   "lvl": 9,
+   "n": 3
+  },
+  "HammerUppercutDamage": {
+   "a": 18,
+   "lvl": 9,
+   "n": 14
+  },
+  "MinInitialHp": {
+   "a": 80,
+   "lvl": 8,
+   "n": 70
+  },
+  "OneTwoDamage": {
+   "a": 11,
+   "lvl": 9,
+   "n": 10
+  }
+ },
+ "AXE_RUBY_RAIDER": {
+  "BigSwingDamage": {
+   "a": 13,
+   "lvl": 9,
+   "n": 12
+  },
+  "MaxInitialHp": {
+   "a": 23,
+   "lvl": 8,
+   "n": 22
+  },
+  "MinInitialHp": {
+   "a": 21,
+   "lvl": 8,
+   "n": 20
+  },
+  "SwingBlock": {
+   "a": 6,
+   "lvl": 9,
+   "n": 5
+  },
+  "SwingDamage": {
+   "a": 6,
+   "lvl": 9,
+   "n": 5
+  }
+ },
+ "BOWLBUG_EGG": {
+  "BiteDamage": {
+   "a": 8,
+   "lvl": 9,
+   "n": 7
+  },
+  "MaxInitialHp": {
+   "a": 24,
+   "lvl": 8,
+   "n": 22
+  },
+  "MinInitialHp": {
+   "a": 23,
+   "lvl": 8,
+   "n": 21
+  },
+  "ProtectBlock": {
+   "a": 8,
+   "lvl": 9,
+   "n": 7
+  }
+ },
+ "BOWLBUG_NECTAR": {
+  "BuffStrengthGain": {
+   "a": 16,
+   "lvl": 9,
+   "n": 15
+  },
+  "MaxInitialHp": {
+   "a": 39,
+   "lvl": 8,
+   "n": 38
+  },
+  "MinInitialHp": {
+   "a": 36,
+   "lvl": 8,
+   "n": 35
+  }
+ },
+ "BOWLBUG_ROCK": {
+  "HeadbuttDamage": {
+   "a": 16,
+   "lvl": 9,
+   "n": 15
+  },
+  "MaxInitialHp": {
+   "a": 49,
+   "lvl": 8,
+   "n": 48
+  },
+  "MinInitialHp": {
+   "a": 46,
+   "lvl": 8,
+   "n": 45
+  }
+ },
+ "BOWLBUG_SILK": {
+  "MaxInitialHp": {
+   "a": 44,
+   "lvl": 8,
+   "n": 43
+  },
+  "MinInitialHp": {
+   "a": 41,
+   "lvl": 8,
+   "n": 40
+  },
+  "ThrashDamage": {
+   "a": 5,
+   "lvl": 9,
+   "n": 4
+  }
+ },
+ "BRUTE_RUBY_RAIDER": {
+  "BeatDamage": {
+   "a": 8,
+   "lvl": 9,
+   "n": 7
+  },
+  "MaxInitialHp": {
+   "a": 34,
+   "lvl": 8,
+   "n": 33
+  },
+  "MinInitialHp": {
+   "a": 31,
+   "lvl": 8,
+   "n": 30
+  }
+ },
+ "BYGONE_EFFIGY": {
+  "MinInitialHp": {
+   "a": 132,
+   "lvl": 8,
+   "n": 127
+  },
+  "SlashDamage": {
+   "a": 15,
+   "lvl": 9,
+   "n": 13
+  }
+ },
+ "BYRDONIS": {
+  "MaxInitialHp": {
+   "a": 90,
+   "lvl": 8,
+   "n": 84
+  },
+  "MinInitialHp": {
+   "a": 90,
+   "lvl": 8,
+   "n": 81
+  },
+  "PeckDamage": {
+   "a": 4,
+   "lvl": 9,
+   "n": 3
+  },
+  "PeckRepeat": {
+   "a": 3,
+   "lvl": 9,
+   "n": 3
+  },
+  "SwoopDamage": {
+   "a": 19,
+   "lvl": 9,
+   "n": 17
+  }
+ },
+ "CALCIFIED_CULTIST": {
+  "DarkStrikeDamage": {
+   "a": 11,
+   "lvl": 9,
+   "n": 9
+  },
+  "MaxInitialHp": {
+   "a": 42,
+   "lvl": 8,
+   "n": 41
+  },
+  "MinInitialHp": {
+   "a": 39,
+   "lvl": 8,
+   "n": 38
+  }
+ },
+ "CEREMONIAL_BEAST": {
+  "CrushDamage": {
+   "a": 19,
+   "lvl": 9,
+   "n": 17
+  },
+  "CrushStrength": {
+   "a": 4,
+   "lvl": 9,
+   "n": 3
+  },
+  "MinInitialHp": {
+   "a": 262,
+   "dadd": 30,
+   "lvl": 8,
+   "n": 252
+  },
+  "PlowAmount": {
+   "a": 160,
+   "lvl": 9,
+   "n": 150
+  },
+  "PlowDamage": {
+   "a": 20,
+   "lvl": 9,
+   "n": 18
+  },
+  "PlowStrength": {
+   "dval": 3,
+   "n": 2
+  },
+  "RitualAmount": {
+   "dval": 2,
+   "n": 0
+  },
+  "StompDamage": {
+   "a": 17,
+   "lvl": 9,
+   "n": 15
+  }
+ },
+ "CHOMPER": {
+  "ClampDamage": {
+   "a": 9,
+   "lvl": 9,
+   "n": 8
+  },
+  "MaxInitialHp": {
+   "a": 67,
+   "lvl": 8,
+   "n": 64
+  },
+  "MinInitialHp": {
+   "a": 63,
+   "lvl": 8,
+   "n": 60
+  }
+ },
+ "CORPSE_SLUG": {
+  "GlompDamage": {
+   "a": 9,
+   "lvl": 9,
+   "n": 8
+  },
+  "MaxInitialHp": {
+   "a": 29,
+   "lvl": 8,
+   "n": 27
+  },
+  "MinInitialHp": {
+   "a": 27,
+   "lvl": 8,
+   "n": 25
+  },
+  "RavenousStr": {
+   "a": 5,
+   "lvl": 9,
+   "n": 4
+  }
+ },
+ "CROSSBOW_RUBY_RAIDER": {
+  "FireDamage": {
+   "a": 16,
+   "lvl": 9,
+   "n": 14
+  },
+  "MaxInitialHp": {
+   "a": 22,
+   "lvl": 8,
+   "n": 21
+  },
+  "MinInitialHp": {
+   "a": 19,
+   "lvl": 8,
+   "n": 18
+  }
+ },
+ "CRUSHER": {
+  "AdaptStrengthGain": {
+   "a": 3,
+   "lvl": 9,
+   "n": 2
+  },
+  "BugStingDamage": {
+   "a": 7,
+   "lvl": 9,
+   "n": 6
+  },
+  "EnlargingStrikeDamage": {
+   "a": 4,
+   "lvl": 9,
+   "n": 4
+  },
+  "GuardedStrikeDamage": {
+   "a": 14,
+   "lvl": 9,
+   "n": 12
+  },
+  "MinInitialHp": {
+   "a": 219,
+   "lvl": 8,
+   "n": 209
+  },
+  "PlatingAmount": {
+   "dval": 14,
+   "n": 0
+  },
+  "ThrashDamage": {
+   "a": 14,
+   "lvl": 9,
+   "n": 12
+  }
+ },
+ "CUBEX_CONSTRUCT": {
+  "BlastDamage": {
+   "a": 8,
+   "lvl": 9,
+   "n": 7
+  },
+  "ExpelDamage": {
+   "a": 6,
+   "lvl": 9,
+   "n": 5
+  },
+  "MinInitialHp": {
+   "a": 70,
+   "lvl": 8,
+   "n": 65
+  }
+ },
+ "DAMP_CULTIST": {
+  "DarkStrikeDamage": {
+   "a": 3,
+   "lvl": 9,
+   "n": 1
+  },
+  "IncantationAmount": {
+   "a": 6,
+   "lvl": 9,
+   "n": 5
+  },
+  "MaxInitialHp": {
+   "a": 54,
+   "lvl": 8,
+   "n": 53
+  },
+  "MinInitialHp": {
+   "a": 52,
+   "lvl": 8,
+   "n": 51
+  }
+ },
+ "DECIMILLIPEDE_SEGMENT": {
+  "BulkDamage": {
+   "a": 7,
+   "lvl": 9,
+   "n": 6
+  },
+  "ConstrictDamage": {
+   "a": 9,
+   "lvl": 9,
+   "n": 8
+  },
+  "MaxInitialHp": {
+   "a": 52,
+   "lvl": 8,
+   "n": 46
+  },
+  "MinInitialHp": {
+   "a": 46,
+   "lvl": 8,
+   "n": 40
+  },
+  "WritheDamage": {
+   "a": 6,
+   "lvl": 9,
+   "n": 5
+  }
+ },
+ "DEVOTED_SCULPTOR": {
+  "MinInitialHp": {
+   "a": 172,
+   "lvl": 8,
+   "n": 162
+  },
+  "SavageDamage": {
+   "a": 15,
+   "lvl": 9,
+   "n": 12
+  }
+ },
+ "ENTOMANCER": {
+  "BeesDamage": {
+   "a": 3,
+   "lvl": 9,
+   "n": 3
+  },
+  "BeesRepeat": {
+   "a": 8,
+   "lvl": 9,
+   "n": 7
+  },
+  "MinInitialHp": {
+   "a": 165,
+   "lvl": 8,
+   "n": 145
+  },
+  "SpearMoveDamage": {
+   "a": 20,
+   "lvl": 9,
+   "n": 18
+  }
+ },
+ "EXOSKELETON": {
+  "MandiblesDamage": {
+   "a": 9,
+   "lvl": 9,
+   "n": 8
+  },
+  "MaxInitialHp": {
+   "a": 30,
+   "lvl": 8,
+   "n": 28
+  },
+  "MinInitialHp": {
+   "a": 26,
+   "lvl": 8,
+   "n": 24
+  },
+  "SkitterRepeats": {
+   "a": 4,
+   "lvl": 9,
+   "n": 3
+  }
+ },
+ "FABRICATOR": {
+  "DisintegrateDamage": {
+   "a": 13,
+   "lvl": 9,
+   "n": 11
+  },
+  "FabricatingStrikeDamage": {
+   "a": 21,
+   "lvl": 9,
+   "n": 18
+  },
+  "MinInitialHp": {
+   "a": 155,
+   "lvl": 8,
+   "n": 150
+  }
+ },
+ "FAKE_MERCHANT_MONSTER": {
+  "MaxInitialHp": {
+   "a": 175,
+   "lvl": 8,
+   "n": 165
+  },
+  "MinInitialHp": {
+   "a": 175,
+   "lvl": 8,
+   "n": 165
+  },
+  "SwipeDamage": {
+   "a": 15,
+   "lvl": 9,
+   "n": 13
+  },
+  "ThrowRelicDamage": {
+   "a": 10,
+   "lvl": 9,
+   "n": 9
+  }
+ },
+ "FAT_GREMLIN": {
+  "MaxInitialHp": {
+   "a": 18,
+   "lvl": 8,
+   "n": 17
+  },
+  "MinInitialHp": {
+   "a": 14,
+   "lvl": 8,
+   "n": 13
+  }
+ },
+ "FLAIL_KNIGHT": {
+  "FlailDamage": {
+   "a": 10,
+   "lvl": 9,
+   "n": 9
+  },
+  "MinInitialHp": {
+   "a": 108,
+   "lvl": 8,
+   "n": 101
+  },
+  "RamDamage": {
+   "a": 17,
+   "lvl": 9,
+   "n": 15
+  }
+ },
+ "FLYCONID": {
+  "MaxInitialHp": {
+   "a": 53,
+   "lvl": 8,
+   "n": 49
+  },
+  "MinInitialHp": {
+   "a": 51,
+   "lvl": 8,
+   "n": 47
+  },
+  "SmashDamage": {
+   "a": 12,
+   "lvl": 9,
+   "n": 11
+  },
+  "SporeDamage": {
+   "a": 9,
+   "lvl": 9,
+   "n": 8
+  }
+ },
+ "FOGMOG": {
+  "HeadbuttDamage": {
+   "a": 16,
+   "lvl": 9,
+   "n": 14
+  },
+  "MinInitialHp": {
+   "a": 78,
+   "lvl": 8,
+   "n": 74
+  },
+  "SwipeDamage": {
+   "a": 9,
+   "lvl": 9,
+   "n": 8
+  }
+ },
+ "FOSSIL_STALKER": {
+  "LashDamage": {
+   "a": 4,
+   "lvl": 9,
+   "n": 3
+  },
+  "LatchDamage": {
+   "a": 14,
+   "lvl": 9,
+   "n": 12
+  },
+  "MaxInitialHp": {
+   "a": 56,
+   "lvl": 8,
+   "n": 53
+  },
+  "MinInitialHp": {
+   "a": 54,
+   "lvl": 8,
+   "n": 51
+  },
+  "TackleDamage": {
+   "a": 11,
+   "lvl": 9,
+   "n": 9
+  }
+ },
+ "FROG_KNIGHT": {
+  "BeetleChargeDamage": {
+   "a": 40,
+   "lvl": 9,
+   "n": 35
+  },
+  "MinInitialHp": {
+   "a": 199,
+   "lvl": 8,
+   "n": 191
+  },
+  "PlatingAmount": {
+   "a": 19,
+   "lvl": 8,
+   "n": 15
+  },
+  "StrikeDownEvilDamage": {
+   "a": 23,
+   "lvl": 9,
+   "n": 21
+  },
+  "TongueLashDamage": {
+   "a": 14,
+   "lvl": 9,
+   "n": 13
+  }
+ },
+ "FUZZY_WURM_CRAWLER": {
+  "AcidGoopDamage": {
+   "a": 6,
+   "lvl": 9,
+   "n": 4
+  },
+  "MaxInitialHp": {
+   "a": 59,
+   "lvl": 8,
+   "n": 57
+  },
+  "MinInitialHp": {
+   "a": 58,
+   "lvl": 8,
+   "n": 55
+  }
+ },
+ "GAS_BOMB": {
+  "ExplodeDamage": {
+   "a": 9,
+   "lvl": 9,
+   "n": 8
+  },
+  "MinInitialHp": {
+   "a": 8,
+   "lvl": 8,
+   "n": 7
+  }
+ },
+ "GLOBE_HEAD": {
+  "GalvanicBurstDamage": {
+   "a": 17,
+   "lvl": 9,
+   "n": 16
+  },
+  "GalvanicPowerAmount": {
+   "a": 8,
+   "lvl": 9,
+   "n": 6
+  },
+  "MinInitialHp": {
+   "a": 158,
+   "lvl": 8,
+   "n": 148
+  },
+  "ShockingSlapDamage": {
+   "a": 14,
+   "lvl": 9,
+   "n": 13
+  },
+  "ThunderStrikeDamage": {
+   "a": 7,
+   "lvl": 9,
+   "n": 6
+  }
+ },
+ "GREMLIN_MERC": {
+  "DoubleSmashDamage": {
+   "a": 7,
+   "lvl": 8,
+   "n": 6
+  },
+  "GimmeDamage": {
+   "a": 8,
+   "lvl": 8,
+   "n": 7
+  },
+  "HeheDamage": {
+   "a": 9,
+   "lvl": 8,
+   "n": 8
+  },
+  "MaxInitialHp": {
+   "a": 53,
+   "lvl": 8,
+   "n": 49
+  },
+  "MinInitialHp": {
+   "a": 51,
+   "lvl": 8,
+   "n": 47
+  }
+ },
+ "GUARDBOT": {
+  "MaxInitialHp": {
+   "a": 21,
+   "lvl": 8,
+   "n": 20
+  },
+  "MinInitialHp": {
+   "a": 17,
+   "lvl": 8,
+   "n": 16
+  }
+ },
+ "HAUNTED_SHIP": {
+  "MinInitialHp": {
+   "a": 67,
+   "lvl": 8,
+   "n": 63
+  },
+  "StompDamage": {
+   "a": 5,
+   "lvl": 9,
+   "n": 4
+  },
+  "SwipeDamage": {
+   "a": 14,
+   "lvl": 9,
+   "n": 13
+  }
+ },
+ "HUNTER_KILLER": {
+  "BiteDamage": {
+   "a": 19,
+   "lvl": 9,
+   "n": 17
+  },
+  "MinInitialHp": {
+   "a": 126,
+   "lvl": 8,
+   "n": 121
+  },
+  "PunctureDamage": {
+   "a": 8,
+   "lvl": 9,
+   "n": 7
+  }
+ },
+ "INFESTED_PRISM": {
+  "JabDamage": {
+   "a": 17,
+   "lvl": 9,
+   "n": 15
+  },
+  "MinInitialHp": {
+   "a": 171,
+   "lvl": 8,
+   "n": 161
+  },
+  "PulsateDamage": {
+   "a": 10,
+   "lvl": 9,
+   "n": 8
+  },
+  "VitalSparkAmount": {
+   "a": 3,
+   "lvl": 9,
+   "n": 2
+  },
+  "WhirlwindDamage": {
+   "a": 6,
+   "lvl": 9,
+   "n": 5
+  }
+ },
+ "INKLET": {
+  "JabDamage": {
+   "a": 4,
+   "lvl": 9,
+   "n": 3
+  },
+  "MaxInitialHp": {
+   "a": 18,
+   "lvl": 8,
+   "n": 17
+  },
+  "MinInitialHp": {
+   "a": 12,
+   "lvl": 8,
+   "n": 11
+  },
+  "PiercingGazeDamage": {
+   "a": 11,
+   "lvl": 9,
+   "n": 10
+  },
+  "WhirlwindDamage": {
+   "a": 3,
+   "lvl": 9,
+   "n": 2
+  }
+ },
+ "KIN_FOLLOWER": {
+  "BoomerangDamage": {
+   "a": 2,
+   "lvl": 9,
+   "n": 2
+  },
+  "DanceStrength": {
+   "a": 3,
+   "lvl": 9,
+   "n": 2
+  },
+  "MaxInitialHp": {
+   "a": 63,
+   "lvl": 8,
+   "n": 59
+  },
+  "MinInitialHp": {
+   "a": 62,
+   "lvl": 8,
+   "n": 58
+  },
+  "QuickSlashDamage": {
+   "a": 5,
+   "lvl": 9,
+   "n": 5
+  }
+ },
+ "KIN_PRIEST": {
+  "BeamDamage": {
+   "a": 3,
+   "lvl": 9,
+   "n": 3
+  },
+  "MinInitialHp": {
+   "a": 199,
+   "lvl": 8,
+   "n": 190
+  },
+  "OrbOfFrailtyDamage": {
+   "a": 9,
+   "lvl": 9,
+   "n": 8
+  },
+  "OrbOfWeaknessDamage": {
+   "a": 9,
+   "lvl": 9,
+   "n": 8
+  },
+  "RitualStrength": {
+   "a": 3,
+   "lvl": 9,
+   "n": 2
+  }
+ },
+ "KNOWLEDGE_DEMON": {
+  "KnowledgeOverwhelmingDamage": {
+   "a": 9,
+   "lvl": 9,
+   "n": 8
+  },
+  "MinInitialHp": {
+   "a": 399,
+   "lvl": 8,
+   "n": 379
+  },
+  "PonderDamage": {
+   "a": 13,
+   "lvl": 9,
+   "n": 11
+  },
+  "PonderStrength": {
+   "a": 3,
+   "lvl": 9,
+   "n": 2
+  },
+  "SlapDamage": {
+   "a": 18,
+   "lvl": 9,
+   "n": 17
+  }
+ },
+ "LAGAVULIN_MATRIARCH": {
+  "DebuffAmount": {
+   "dval": -3,
+   "n": -2
+  },
+  "DisembowelDamage": {
+   "a": 10,
+   "lvl": 9,
+   "n": 9
+  },
+  "MinInitialHp": {
+   "a": 233,
+   "dadd": 22,
+   "lvl": 8,
+   "n": 222
+  },
+  "Slash2Block": {
+   "a": 14,
+   "dadd": 2,
+   "lvl": 8,
+   "n": 12
+  },
+  "Slash2Damage": {
+   "a": 14,
+   "dadd": 2,
+   "lvl": 9,
+   "n": 12
+  },
+  "SlashDamage": {
+   "a": 21,
+   "lvl": 9,
+   "n": 19
+  }
+ },
+ "LEAF_SLIME_M": {
+  "ClumpDamage": {
+   "a": 9,
+   "lvl": 9,
+   "n": 8
+  },
+  "MaxInitialHp": {
+   "a": 36,
+   "lvl": 8,
+   "n": 35
+  },
+  "MinInitialHp": {
+   "a": 33,
+   "lvl": 8,
+   "n": 32
+  }
+ },
+ "LEAF_SLIME_S": {
+  "MaxInitialHp": {
+   "a": 16,
+   "lvl": 8,
+   "n": 15
+  },
+  "MinInitialHp": {
+   "a": 12,
+   "lvl": 8,
+   "n": 11
+  },
+  "TackleDamage": {
+   "a": 4,
+   "lvl": 9,
+   "n": 3
+  }
+ },
+ "LIVING_FOG": {
+  "AdvancedGasDamage": {
+   "a": 9,
+   "lvl": 9,
+   "n": 8
+  },
+  "BloatDamage": {
+   "a": 6,
+   "lvl": 9,
+   "n": 5
+  },
+  "MinInitialHp": {
+   "a": 82,
+   "lvl": 8,
+   "n": 80
+  },
+  "SuperGasBlastDamage": {
+   "a": 9,
+   "lvl": 9,
+   "n": 8
+  }
+ },
+ "LIVING_SHIELD": {
+  "MinInitialHp": {
+   "a": 65,
+   "lvl": 8,
+   "n": 55
+  },
+  "SmashDamage": {
+   "a": 18,
+   "lvl": 9,
+   "n": 16
+  }
+ },
+ "LOUSE_PROGENITOR": {
+  "CurlBlock": {
+   "a": 18,
+   "lvl": 8,
+   "n": 14
+  },
+  "GrowStrength": {
+   "a": 7,
+   "lvl": 9,
+   "n": 5
+  },
+  "MaxInitialHp": {
+   "a": 141,
+   "lvl": 8,
+   "n": 136
+  },
+  "MinInitialHp": {
+   "a": 138,
+   "lvl": 8,
+   "n": 134
+  },
+  "PounceDamage": {
+   "a": 16,
+   "lvl": 9,
+   "n": 14
+  },
+  "WebDamage": {
+   "a": 10,
+   "lvl": 9,
+   "n": 9
+  }
+ },
+ "MAGI_KNIGHT": {
+  "BombDamage": {
+   "a": 40,
+   "lvl": 9,
+   "n": 35
+  },
+  "MinInitialHp": {
+   "a": 89,
+   "lvl": 8,
+   "n": 82
+  },
+  "PowerShieldBlock": {
+   "a": 9,
+   "lvl": 8,
+   "n": 5
+  },
+  "PowerShieldDamage": {
+   "a": 7,
+   "lvl": 9,
+   "n": 6
+  },
+  "SpearDamage": {
+   "a": 11,
+   "lvl": 9,
+   "n": 10
+  }
+ },
+ "MAWLER": {
+  "ClawDamage": {
+   "a": 5,
+   "lvl": 9,
+   "n": 4
+  },
+  "MinInitialHp": {
+   "a": 76,
+   "lvl": 8,
+   "n": 72
+  },
+  "RipAndTearDamage": {
+   "a": 16,
+   "lvl": 9,
+   "n": 14
+  }
+ },
+ "MECHA_KNIGHT": {
+  "ChargeDamage": {
+   "a": 30,
+   "lvl": 9,
+   "n": 25
+  },
+  "FlamethrowerDamage": {
+   "a": 12,
+   "lvl": 9,
+   "n": 8
+  },
+  "HeavyCleaveDamage": {
+   "a": 40,
+   "lvl": 9,
+   "n": 35
+  },
+  "MinInitialHp": {
+   "a": 320,
+   "lvl": 8,
+   "n": 300
+  }
+ },
+ "MYTE": {
+  "BiteDamage": {
+   "a": 15,
+   "lvl": 9,
+   "n": 13
+  },
+  "MaxInitialHp": {
+   "a": 69,
+   "lvl": 8,
+   "n": 67
+  },
+  "MinInitialHp": {
+   "a": 64,
+   "lvl": 8,
+   "n": 61
+  },
+  "SuckDamage": {
+   "a": 6,
+   "lvl": 9,
+   "n": 4
+  },
+  "SuckStrength": {
+   "a": 3,
+   "lvl": 9,
+   "n": 2
+  }
+ },
+ "NIBBIT": {
+  "ButtDamage": {
+   "a": 13,
+   "lvl": 9,
+   "n": 12
+  },
+  "HissStrengthGain": {
+   "a": 3,
+   "lvl": 9,
+   "n": 2
+  },
+  "MaxInitialHp": {
+   "a": 48,
+   "lvl": 8,
+   "n": 46
+  },
+  "MinInitialHp": {
+   "a": 44,
+   "lvl": 8,
+   "n": 42
+  },
+  "SliceBlock": {
+   "a": 6,
+   "lvl": 8,
+   "n": 5
+  },
+  "SliceDamage": {
+   "a": 7,
+   "lvl": 9,
+   "n": 6
+  }
+ },
+ "NOISEBOT": {
+  "MaxInitialHp": {
+   "a": 24,
+   "lvl": 8,
+   "n": 23
+  },
+  "MinInitialHp": {
+   "a": 19,
+   "lvl": 8,
+   "n": 18
+  }
+ },
+ "OVICOPTER": {
+  "MaxInitialHp": {
+   "a": 132,
+   "lvl": 8,
+   "n": 130
+  },
+  "MinInitialHp": {
+   "a": 126,
+   "lvl": 8,
+   "n": 124
+  },
+  "NutritionalPasteStrengthAmount": {
+   "a": 4,
+   "lvl": 9,
+   "n": 3
+  },
+  "SmashDamage": {
+   "a": 17,
+   "lvl": 9,
+   "n": 16
+  },
+  "TenderizerDamage": {
+   "a": 8,
+   "lvl": 9,
+   "n": 7
+  }
+ },
+ "OWL_MAGISTRATE": {
+  "MinInitialHp": {
+   "a": 247,
+   "lvl": 8,
+   "n": 231
+  },
+  "PeckAssaultDamage": {
+   "a": 4,
+   "lvl": 9,
+   "n": 4
+  },
+  "ScrutinyDamage": {
+   "a": 17,
+   "lvl": 9,
+   "n": 16
+  },
+  "VerdictDamage": {
+   "a": 36,
+   "lvl": 9,
+   "n": 33
+  }
+ },
+ "PARAFRIGHT": {
+  "SlamDamage": {
+   "a": 17,
+   "lvl": 9,
+   "n": 16
+  }
+ },
+ "PHANTASMAL_GARDENER": {
+  "BiteDamage": {
+   "a": 5,
+   "lvl": 9,
+   "n": 5
+  },
+  "EnlargeStr": {
+   "a": 3,
+   "lvl": 9,
+   "n": 2
+  },
+  "FlailRepeat": {
+   "a": 3,
+   "lvl": 9,
+   "n": 3
+  },
+  "LashDamage": {
+   "a": 7,
+   "lvl": 9,
+   "n": 7
+  },
+  "MaxInitialHp": {
+   "a": 32,
+   "lvl": 8,
+   "n": 31
+  },
+  "MinInitialHp": {
+   "a": 27,
+   "lvl": 8,
+   "n": 26
+  },
+  "SkittishAmount": {
+   "a": 7,
+   "lvl": 8,
+   "n": 6
+  }
+ },
+ "PHROG_PARASITE": {
+  "LashDamage": {
+   "a": 5,
+   "lvl": 9,
+   "n": 4
+  },
+  "MaxInitialHp": {
+   "a": 68,
+   "lvl": 8,
+   "n": 64
+  },
+  "MinInitialHp": {
+   "a": 66,
+   "lvl": 8,
+   "n": 61
+  }
+ },
+ "PUNCH_CONSTRUCT": {
+  "FastPunchDamage": {
+   "a": 6,
+   "lvl": 9,
+   "n": 5
+  },
+  "MinInitialHp": {
+   "a": 60,
+   "lvl": 8,
+   "n": 55
+  },
+  "StrongPunchDamage": {
+   "a": 16,
+   "lvl": 9,
+   "n": 14
+  }
+ },
+ "QUEEN": {
+  "ExecutionDamage": {
+   "a": 18,
+   "lvl": 9,
+   "n": 15
+  },
+  "MinInitialHp": {
+   "a": 419,
+   "lvl": 8,
+   "n": 400
+  },
+  "OffWithYourHeadDamage": {
+   "a": 4,
+   "lvl": 9,
+   "n": 3
+  }
+ },
+ "ROCKET": {
+  "CalculatingDamage": {
+   "a": 4,
+   "lvl": 9,
+   "n": 3
+  },
+  "ChargeUpStrengthGain": {
+   "a": 3,
+   "lvl": 9,
+   "n": 2
+  },
+  "MinInitialHp": {
+   "a": 209,
+   "lvl": 8,
+   "n": 199
+  },
+  "PlatingAmount": {
+   "dval": 14,
+   "n": 0
+  },
+  "PreciseSmashDamage": {
+   "a": 20,
+   "lvl": 9,
+   "n": 18
+  },
+  "RocketClawDamage": {
+   "a": 35,
+   "dadd": 5,
+   "lvl": 9,
+   "n": 31
+  }
+ },
+ "SCROLL_OF_BITING": {
+  "ChewDamage": {
+   "a": 6,
+   "lvl": 9,
+   "n": 5
+  },
+  "ChompDamage": {
+   "a": 16,
+   "lvl": 9,
+   "n": 14
+  },
+  "MaxInitialHp": {
+   "a": 39,
+   "lvl": 8,
+   "n": 37
+  },
+  "MinInitialHp": {
+   "a": 33,
+   "lvl": 8,
+   "n": 30
+  }
+ },
+ "SEAPUNK": {
+  "BubbleBlock": {
+   "a": 8,
+   "lvl": 8,
+   "n": 7
+  },
+  "BubbleStr": {
+   "a": 2,
+   "lvl": 9,
+   "n": 1
+  },
+  "MaxInitialHp": {
+   "a": 49,
+   "lvl": 8,
+   "n": 46
+  },
+  "MinInitialHp": {
+   "a": 47,
+   "lvl": 8,
+   "n": 44
+  },
+  "SeaKickDamage": {
+   "a": 13,
+   "lvl": 9,
+   "n": 11
+  }
+ },
+ "SEWER_CLAM": {
+  "JetDamage": {
+   "a": 11,
+   "lvl": 9,
+   "n": 10
+  },
+  "MinInitialHp": {
+   "a": 58,
+   "lvl": 8,
+   "n": 56
+  }
+ },
+ "SHRINKER_BEETLE": {
+  "ChompDamage": {
+   "a": 8,
+   "lvl": 9,
+   "n": 7
+  },
+  "MaxInitialHp": {
+   "a": 42,
+   "lvl": 8,
+   "n": 40
+  },
+  "MinInitialHp": {
+   "a": 40,
+   "lvl": 8,
+   "n": 38
+  },
+  "StompDamage": {
+   "a": 14,
+   "lvl": 9,
+   "n": 13
+  }
+ },
+ "SKULKING_COLONY": {
+  "InertiaDamage": {
+   "a": 11,
+   "lvl": 9,
+   "n": 9
+  },
+  "InertiaStrengthGain": {
+   "a": 4,
+   "lvl": 9,
+   "n": 2
+  },
+  "MinInitialHp": {
+   "a": 80,
+   "lvl": 8,
+   "n": 75
+  },
+  "PiercingStabsDamage": {
+   "a": 8,
+   "lvl": 9,
+   "n": 7
+  },
+  "ZoomDamage": {
+   "a": 16,
+   "lvl": 9,
+   "n": 14
+  }
+ },
+ "SLIMED_BERSERKER": {
+  "MinInitialHp": {
+   "a": 281,
+   "lvl": 8,
+   "n": 261
+  },
+  "PummelingDamage": {
+   "a": 5,
+   "lvl": 9,
+   "n": 4
+  },
+  "SmotherDamage": {
+   "a": 33,
+   "lvl": 9,
+   "n": 30
+  }
+ },
+ "SLITHERING_STRANGLER": {
+  "LashDamage": {
+   "a": 13,
+   "lvl": 9,
+   "n": 12
+  },
+  "MaxInitialHp": {
+   "a": 56,
+   "lvl": 8,
+   "n": 55
+  },
+  "MinInitialHp": {
+   "a": 54,
+   "lvl": 8,
+   "n": 53
+  },
+  "ThwackDamage": {
+   "a": 8,
+   "lvl": 9,
+   "n": 7
+  }
+ },
+ "SLUDGE_SPINNER": {
+  "MaxInitialHp": {
+   "a": 42,
+   "lvl": 8,
+   "n": 39
+  },
+  "MinInitialHp": {
+   "a": 41,
+   "lvl": 8,
+   "n": 37
+  },
+  "OilSprayDamage": {
+   "a": 9,
+   "lvl": 9,
+   "n": 8
+  },
+  "RageDamage": {
+   "a": 7,
+   "lvl": 9,
+   "n": 6
+  },
+  "SlamDamage": {
+   "a": 12,
+   "lvl": 9,
+   "n": 11
+  }
+ },
+ "SLUMBERING_BEETLE": {
+  "MinInitialHp": {
+   "a": 89,
+   "lvl": 8,
+   "n": 86
+  },
+  "PlatingAmount": {
+   "a": 18,
+   "lvl": 8,
+   "n": 15
+  },
+  "RolloutDamage": {
+   "a": 18,
+   "lvl": 9,
+   "n": 16
+  }
+ },
+ "SNAPPING_JAXFRUIT": {
+  "EnergyDamage": {
+   "a": 4,
+   "lvl": 9,
+   "n": 3
+  },
+  "MaxInitialHp": {
+   "a": 36,
+   "lvl": 8,
+   "n": 33
+  },
+  "MinInitialHp": {
+   "a": 34,
+   "lvl": 8,
+   "n": 31
+  }
+ },
+ "SNEAKY_GREMLIN": {
+  "MaxInitialHp": {
+   "a": 15,
+   "lvl": 8,
+   "n": 14
+  },
+  "MinInitialHp": {
+   "a": 11,
+   "lvl": 8,
+   "n": 10
+  },
+  "TackleDamage": {
+   "a": 10,
+   "lvl": 9,
+   "n": 9
+  }
+ },
+ "SOUL_FYSH": {
+  "BeckonMoveAmount": {
+   "dval": 3,
+   "n": 2
+  },
+  "DeGasDamage": {
+   "a": 18,
+   "lvl": 9,
+   "n": 16
+  },
+  "GazeDamage": {
+   "a": 8,
+   "lvl": 9,
+   "n": 7
+  },
+  "MinInitialHp": {
+   "a": 221,
+   "lvl": 8,
+   "n": 211
+  },
+  "ScreamDamage": {
+   "a": 15,
+   "lvl": 9,
+   "n": 13
+  }
+ },
+ "SOUL_NEXUS": {
+  "DrainLifeDamage": {
+   "a": 19,
+   "lvl": 9,
+   "n": 18
+  },
+  "MaelstromDamage": {
+   "a": 7,
+   "lvl": 9,
+   "n": 6
+  },
+  "MaelstromRepeat": {
+   "a": 4,
+   "lvl": 9,
+   "n": 4
+  },
+  "MinInitialHp": {
+   "a": 254,
+   "lvl": 8,
+   "n": 234
+  },
+  "SoulBurnDamage": {
+   "a": 31,
+   "lvl": 9,
+   "n": 29
+  }
+ },
+ "SPECTRAL_KNIGHT": {
+  "MinInitialHp": {
+   "a": 97,
+   "lvl": 8,
+   "n": 93
+  },
+  "SoulFlameDamage": {
+   "a": 4,
+   "lvl": 9,
+   "n": 3
+  },
+  "SoulSlashDamage": {
+   "a": 17,
+   "lvl": 9,
+   "n": 15
+  }
+ },
+ "SPINY_TOAD": {
+  "ExplosionDamage": {
+   "a": 25,
+   "lvl": 9,
+   "n": 23
+  },
+  "LashDamage": {
+   "a": 19,
+   "lvl": 9,
+   "n": 17
+  },
+  "MaxInitialHp": {
+   "a": 124,
+   "lvl": 8,
+   "n": 119
+  },
+  "MinInitialHp": {
+   "a": 121,
+   "lvl": 8,
+   "n": 116
+  }
+ },
+ "STABBOT": {
+  "MaxInitialHp": {
+   "a": 24,
+   "lvl": 8,
+   "n": 23
+  },
+  "MinInitialHp": {
+   "a": 19,
+   "lvl": 8,
+   "n": 18
+  },
+  "StabDamage": {
+   "a": 12,
+   "lvl": 9,
+   "n": 11
+  }
+ },
+ "TERROR_EEL": {
+  "CrashDamage": {
+   "a": 18,
+   "lvl": 9,
+   "n": 16
+  },
+  "MinInitialHp": {
+   "a": 150,
+   "lvl": 8,
+   "n": 140
+  },
+  "ShriekAmount": {
+   "a": 75,
+   "lvl": 8,
+   "n": 70
+  },
+  "ThrashDamage": {
+   "a": 4,
+   "lvl": 9,
+   "n": 3
+  }
+ },
+ "TEST_SUBJECT": {
+  "BaseMultiClawCount": {
+   "dval": 4,
+   "n": 3
+  },
+  "BiteDamage": {
+   "a": 22,
+   "lvl": 9,
+   "n": 20
+  },
+  "BurningGrowlBurnCount": {
+   "a": 5,
+   "lvl": 9,
+   "n": 3
+  },
+  "BurningGrowlStrengthGain": {
+   "a": 3,
+   "dadd": 3,
+   "lvl": 9,
+   "n": 2
+  },
+  "EnrageAmount": {
+   "a": 3,
+   "dadd": 1,
+   "lvl": 9,
+   "n": 2
+  },
+  "FirstFormHp": {
+   "a": 111,
+   "lvl": 8,
+   "n": 100
+  },
+  "MultiClawDamage": {
+   "a": 11,
+   "lvl": 9,
+   "n": 10
+  },
+  "Phase3LacerateDamage": {
+   "a": 11,
+   "lvl": 9,
+   "n": 10
+  },
+  "SecondFormHp": {
+   "a": 212,
+   "lvl": 8,
+   "n": 200
+  },
+  "SkullBashDamage": {
+   "a": 16,
+   "lvl": 9,
+   "n": 14
+  },
+  "ThirdFormHp": {
+   "a": 313,
+   "lvl": 8,
+   "n": 300
+  }
+ },
+ "THE_ADVERSARY_MK_THREE": {
+  "MinInitialHp": {
+   "a": 300,
+   "lvl": 8,
+   "n": 300
+  }
+ },
+ "THE_ADVERSARY_MK_TWO": {
+  "MinInitialHp": {
+   "a": 200,
+   "lvl": 8,
+   "n": 200
+  }
+ },
+ "THE_FORGOTTEN": {
+  "DebilitatingSmogDexStealAmount": {
+   "a": 2,
+   "lvl": 9,
+   "n": 2
+  },
+  "DreadDamage": {
+   "a": 15,
+   "lvl": 9,
+   "n": 13
+  },
+  "MinInitialHp": {
+   "a": 111,
+   "lvl": 8,
+   "n": 106
+  }
+ },
+ "THE_INSATIABLE": {
+  "BiteDamage": {
+   "a": 31,
+   "lvl": 9,
+   "n": 28
+  },
+  "MinInitialHp": {
+   "a": 341,
+   "dadd": 20,
+   "lvl": 8,
+   "n": 321
+  },
+  "SalivateStrength": {
+   "a": 3,
+   "lvl": 9,
+   "n": 2
+  },
+  "SandpitAmount": {
+   "dval": 3,
+   "n": 4
+  },
+  "ThrashDamage": {
+   "a": 9,
+   "lvl": 9,
+   "n": 8
+  }
+ },
+ "THE_LOST": {
+  "DebilitatingSmogStrengthStealAmount": {
+   "a": 2,
+   "lvl": 9,
+   "n": 2
+  },
+  "EyeLasersDamage": {
+   "a": 5,
+   "lvl": 9,
+   "n": 4
+  },
+  "MinInitialHp": {
+   "a": 99,
+   "lvl": 8,
+   "n": 93
+  }
+ },
+ "THE_OBSCURA": {
+  "HardeningStrikeBlock": {
+   "a": 7,
+   "lvl": 9,
+   "n": 6
+  },
+  "HardeningStrikeDamage": {
+   "a": 7,
+   "lvl": 9,
+   "n": 6
+  },
+  "MinInitialHp": {
+   "a": 129,
+   "lvl": 8,
+   "n": 123
+  },
+  "PiercingGazeDamage": {
+   "a": 11,
+   "lvl": 9,
+   "n": 10
+  }
+ },
+ "THIEVING_HOPPER": {
+  "HatTrickDamage": {
+   "a": 23,
+   "lvl": 9,
+   "n": 21
+  },
+  "MinInitialHp": {
+   "a": 84,
+   "lvl": 8,
+   "n": 79
+  },
+  "NabDamage": {
+   "a": 16,
+   "lvl": 9,
+   "n": 14
+  },
+  "TheftDamage": {
+   "a": 19,
+   "lvl": 9,
+   "n": 17
+  }
+ },
+ "TOADPOLE": {
+  "MaxInitialHp": {
+   "a": 26,
+   "lvl": 8,
+   "n": 25
+  },
+  "MinInitialHp": {
+   "a": 22,
+   "lvl": 8,
+   "n": 21
+  },
+  "SpikeSpitDamage": {
+   "a": 4,
+   "lvl": 9,
+   "n": 3
+  },
+  "WhirlDamage": {
+   "a": 8,
+   "lvl": 9,
+   "n": 7
+  }
+ },
+ "TORCH_HEAD_AMALGAM": {
+  "MinInitialHp": {
+   "a": 211,
+   "lvl": 8,
+   "n": 199
+  },
+  "SoulBeamDamage": {
+   "a": 8,
+   "lvl": 9,
+   "n": 8
+  },
+  "StrongTackleDamage": {
+   "a": 32,
+   "dadd": 5,
+   "lvl": 9,
+   "n": 26
+  },
+  "TackleDamage": {
+   "a": 22,
+   "lvl": 9,
+   "n": 18
+  },
+  "WeakTackleDamage": {
+   "a": 16,
+   "lvl": 9,
+   "n": 14
+  }
+ },
+ "TOUGH_EGG": {
+  "HatchlingMaxHp": {
+   "a": 23,
+   "lvl": 8,
+   "n": 22
+  },
+  "HatchlingMinHp": {
+   "a": 20,
+   "lvl": 8,
+   "n": 19
+  },
+  "MaxInitialHp": {
+   "a": 19,
+   "lvl": 8,
+   "n": 18
+  },
+  "MinInitialHp": {
+   "a": 15,
+   "lvl": 8,
+   "n": 14
+  },
+  "NibbleDamage": {
+   "a": 5,
+   "lvl": 9,
+   "n": 4
+  }
+ },
+ "TRACKER_RUBY_RAIDER": {
+  "HoundsDamage": {
+   "a": 1,
+   "lvl": 9,
+   "n": 1
+  },
+  "HoundsRepeat": {
+   "a": 9,
+   "lvl": 9,
+   "n": 8
+  },
+  "MaxInitialHp": {
+   "a": 26,
+   "lvl": 8,
+   "n": 25
+  },
+  "MinInitialHp": {
+   "a": 22,
+   "lvl": 8,
+   "n": 21
+  }
+ },
+ "TUNNELER": {
+  "BiteDamage": {
+   "a": 15,
+   "lvl": 9,
+   "n": 13
+  },
+  "BlockGain": {
+   "a": 37,
+   "lvl": 8,
+   "n": 32
+  },
+  "FromBelowDamage": {
+   "a": 28,
+   "lvl": 9,
+   "n": 24
+  },
+  "MinInitialHp": {
+   "a": 92,
+   "lvl": 8,
+   "n": 87
+  }
+ },
+ "TURRET_OPERATOR": {
+  "FireDamage": {
+   "a": 4,
+   "lvl": 9,
+   "n": 3
+  },
+  "MinInitialHp": {
+   "a": 51,
+   "lvl": 8,
+   "n": 41
+  }
+ },
+ "TWIG_SLIME_M": {
+  "ClumpDamage": {
+   "a": 12,
+   "lvl": 9,
+   "n": 11
+  },
+  "MaxInitialHp": {
+   "a": 29,
+   "lvl": 8,
+   "n": 28
+  },
+  "MinInitialHp": {
+   "a": 27,
+   "lvl": 8,
+   "n": 26
+  }
+ },
+ "TWIG_SLIME_S": {
+  "MaxInitialHp": {
+   "a": 12,
+   "lvl": 8,
+   "n": 11
+  },
+  "MinInitialHp": {
+   "a": 8,
+   "lvl": 8,
+   "n": 7
+  },
+  "TackleDamage": {
+   "a": 5,
+   "lvl": 9,
+   "n": 4
+  }
+ },
+ "TWO_TAILED_RAT": {
+  "DiseaseBiteDamage": {
+   "a": 7,
+   "lvl": 9,
+   "n": 6
+  },
+  "MaxInitialHp": {
+   "a": 22,
+   "lvl": 8,
+   "n": 21
+  },
+  "MinInitialHp": {
+   "a": 18,
+   "lvl": 8,
+   "n": 17
+  },
+  "ScratchDamage": {
+   "a": 9,
+   "lvl": 9,
+   "n": 8
+  }
+ },
+ "VANTOM": {
+  "DismemberDamage": {
+   "a": 30,
+   "lvl": 9,
+   "n": 26
+  },
+  "InkBlotDamage": {
+   "a": 8,
+   "lvl": 9,
+   "n": 7
+  },
+  "InkyLanceDamage": {
+   "a": 7,
+   "lvl": 9,
+   "n": 6
+  },
+  "MinInitialHp": {
+   "a": 183,
+   "lvl": 8,
+   "n": 173
+  },
+  "PrepareStrength": {
+   "dval": 3,
+   "n": 2
+  },
+  "SlipperyAmt": {
+   "a": 9,
+   "dadd": 2,
+   "lvl": 8,
+   "n": 8
+  }
+ },
+ "VINE_SHAMBLER": {
+  "ChompDamage": {
+   "a": 18,
+   "lvl": 9,
+   "n": 16
+  },
+  "GraspingVinesDamage": {
+   "a": 9,
+   "lvl": 9,
+   "n": 8
+  },
+  "MinInitialHp": {
+   "a": 64,
+   "lvl": 8,
+   "n": 61
+  },
+  "SwipeDamage": {
+   "a": 7,
+   "lvl": 9,
+   "n": 6
+  }
+ },
+ "WATERFALL_GIANT": {
+  "BasePressureGunDamage": {
+   "a": 23,
+   "lvl": 9,
+   "n": 20
+  },
+  "MinInitialHp": {
+   "a": 250,
+   "lvl": 8,
+   "n": 240
+  },
+  "PressureUpDamage": {
+   "a": 14,
+   "lvl": 9,
+   "n": 13
+  },
+  "PressurizeAmount": {
+   "a": 20,
+   "lvl": 9,
+   "n": 15
+  },
+  "RamDamage": {
+   "a": 11,
+   "lvl": 9,
+   "n": 10
+  },
+  "SiphonHeal": {
+   "a": 15,
+   "lvl": 8,
+   "n": 10
+  },
+  "SteamBoostAmount": {
+   "dval": 4,
+   "n": 3
+  },
+  "StompDamage": {
+   "a": 16,
+   "lvl": 9,
+   "n": 15
+  }
+ },
+ "WRIGGLER": {
+  "BiteDamage": {
+   "a": 7,
+   "lvl": 9,
+   "n": 6
+  },
+  "MaxInitialHp": {
+   "a": 22,
+   "lvl": 8,
+   "n": 21
+  },
+  "MinInitialHp": {
+   "a": 18,
+   "lvl": 8,
+   "n": 17
+  }
+ },
+ "ZAPBOT": {
+  "MaxInitialHp": {
+   "a": 24,
+   "lvl": 8,
+   "n": 23
+  },
+  "MinInitialHp": {
+   "a": 19,
+   "lvl": 8,
+   "n": 18
+  },
+  "ZapDamage": {
+   "a": 15,
+   "lvl": 9,
+   "n": 14
+  }
+ }
+}

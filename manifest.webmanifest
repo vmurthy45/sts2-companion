@@ -1,6 +1,6 @@
 {
-  "name": "Spire Companion",
-  "short_name": "Spire",
+  "name": "Spire Buddy",
+  "short_name": "Spire Buddy",
   "description": "Slay the Spire 2 reference: enemy patterns by ascension, cards, relics, fights, events.",
   "start_url": "./#/enemies",
   "scope": "./",
