@@ -365,3 +365,26 @@ h1 { font-size: 25px; }
 .fbtn { flex: none; border: 1px solid var(--line); background: var(--card); color: var(--muted); border-radius: 999px; padding: 0 12px; font-size: 13px; font-weight: 600; cursor: pointer; }
 .fbtn.on { background: #1f5923; border-color: #7fff00; color: #7fff00; }
 .fsel:only-child { flex: 0 1 50%; }
+
+/* ---- first-launch install splash (mobile only) ---- */
+body.splash-open { overflow: hidden; }
+#splash { position: fixed; inset: 0; z-index: 100; background: radial-gradient(circle at 50% 30%, #2a2219, var(--bg) 70%);
+  display: flex; align-items: center; justify-content: center; overflow-y: auto;
+  padding: calc(24px + var(--safe-t)) 16px calc(24px + var(--safe-b)); animation: splashIn .25s ease-out; }
+@keyframes splashIn { from { opacity: 0; } to { opacity: 1; } }
+.splash-card { width: 100%; max-width: 380px; text-align: center; }
+.splash-icon { width: 88px; height: 88px; border-radius: 20px; margin: 0 auto 14px; box-shadow: 0 8px 24px rgba(0,0,0,.5); }
+#splash h1 { font-size: 32px; color: #efc851; margin: 0 0 6px; }
+.splash-lede { color: #fff6e2; font-family: 'Kreon', Georgia, serif; font-size: 17px; line-height: 1.4; margin: 0 0 18px; }
+.splash-steps { text-align: left; margin: 0 0 22px; padding: 0; list-style: none; counter-reset: st; }
+.splash-steps li { counter-increment: st; position: relative; background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+  padding: 12px 12px 12px 48px; margin-top: 8px; font-size: 15px; line-height: 1.4; }
+.splash-steps li::before { content: counter(st); position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+  width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: var(--accent-ink); font-weight: 800; font-size: 14px;
+  display: flex; align-items: center; justify-content: center; }
+.ico-inline { width: 1.15em; height: 1.15em; vertical-align: -.2em; color: #2f7fc8; }
+.kbd { display: inline-block; min-width: 1.4em; padding: 0 .3em; border-radius: 6px; background: var(--card2); border: 1px solid var(--line); text-align: center; font-weight: 800; }
+.splash-ok, .splash-primary { width: 100%; border: 0; border-radius: 12px; padding: 14px; font-size: 16px; font-weight: 700; cursor: pointer; }
+.splash-ok { background: var(--accent); color: var(--accent-ink); }
+.splash-primary { background: #1f5923; color: #fff6e2; border: 1px solid #7fff00; margin-bottom: 6px; }
+.splash-primary[hidden] { display: none; }

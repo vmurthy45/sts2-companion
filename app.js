@@ -939,6 +939,7 @@ V.more = () => {
     <a href="#/powers">Powers &amp; keywords <span>${D.powers.length} ›</span></a>
     <a href="#/ascension">Ascension levels <span>${ascLabel(S.asc)} ›</span></a>
     <a href="#/characters">Characters <span>${D.characters.length} ›</span></a>
+    ${devicePlatform() && !isInstalled() ? '<a href="#/more" id="installAgain">Add to Home Screen <span>How to ›</span></a>' : ''}
     <a href="#/news">The Neowsletter <span>${esc((S.meta?.news?.latest || '').replace(/^The Neowsletter - /, '')) || 'Latest'} ›</span></a>
     <a href="#/patch">Latest patch changes <span>v${esc(D.version)} ›</span></a>
   </div>
@@ -948,6 +949,7 @@ V.more = () => {
     <div class="note">Checked every few hours against <a class="t-gold" href="https://spire-codex.com" target="_blank" rel="noopener">Spire Codex</a>, which extracts each patch from the game files. Enemy, card and relic images are served by Spire Codex. Game content © Mega Crit.</div>
     <div class="note">Ascension levels for each enemy value, Dread buffs and event relic sources are read from the game files on Vig’s Mac whenever Steam updates the game.</div>
   </div>`;
+  $('#installAgain')?.addEventListener('click', e => { e.preventDefault(); showSplash(true); });
 };
 
 function backBtn() { return `<button class="back" onclick="history.length > 1 ? history.back() : (location.hash = '#/enemies')">‹ Back</button>`; }
@@ -990,6 +992,64 @@ let lastHash = location.hash;
 window.addEventListener('scroll', () => { scrollPos[(location.hash.replace(/^#\/?/, '') || 'enemies')] = window.scrollY; }, { passive: true });
 window.addEventListener('hashchange', () => { lastHash = location.hash; route(false); });
 
+/* ---- First-launch "Add to Home Screen" splash: phones and tablets only, never once installed ----
+   ?splash=ios|ios-firefox|ios-other|android|android-firefox|samsung forces a variant (for testing). */
+let deferredInstall = null;
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredInstall = e; $('#instBtn')?.removeAttribute('hidden'); });
+window.addEventListener('appinstalled', () => { store.set('installSeen', true); closeSplash(); });
+function devicePlatform() {
+  const force = new URLSearchParams(location.search).get('splash');
+  if (force) return force;
+  const ua = navigator.userAgent;
+  if (/Android/i.test(ua)) return /SamsungBrowser/.test(ua) ? 'samsung' : /Firefox/.test(ua) ? 'android-firefox' : 'android';
+  // iPads report themselves as a Mac, so a touch-screen "Mac" is an iPad
+  const ios = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+  if (ios) return /FxiOS/.test(ua) ? 'ios-firefox' : /CriOS|EdgiOS|OPiOS|DuckDuckGo|GSA\//.test(ua) ? 'ios-other' : 'ios';
+  return null;   // desktop: no splash
+}
+const isInstalled = () => navigator.standalone === true || matchMedia('(display-mode: standalone)').matches || matchMedia('(display-mode: fullscreen)').matches;
+const SHARE_ICO = '<svg class="ico-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-label="Share"><path d="M12 15V3"/><path d="m7 8 5-5 5 5"/><path d="M5 11v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8"/></svg>';
+const DOTS_V = '<b class="kbd">⋮</b>', DOTS_H = '<b class="kbd">⋯</b>', BARS = '<b class="kbd">☰</b>';
+function installSteps(p) {
+  const add = '<b>Add to Home Screen</b>';
+  switch (p) {
+    case 'ios': return [`Tap ${DOTS_H} at the bottom (or the Share button ${SHARE_ICO}), then <b>Share</b>.`, `Scroll down and tap ${add}.`, 'Tap <b>Add</b>.'];
+    case 'ios-firefox': return [`Tap ${BARS}, then <b>Share</b>.`, `Tap ${add}, then <b>Add</b>.`, '<span class="muted">Firefox on iPhone shows a plain letter instead of the app icon. Add it from Safari to get the icon.</span>'];
+    case 'ios-other': return [`Tap the Share button ${SHARE_ICO} (in some browsers it’s under ${DOTS_H}).`, `Scroll down and tap ${add}.`, 'Tap <b>Add</b>.'];
+    case 'samsung': return [`Tap ${BARS} at the bottom.`, 'Tap <b>Add page to</b>, then <b>Home screen</b>.', 'Tap <b>Add</b>.'];
+    case 'android-firefox': return [`Tap ${DOTS_V} in the top corner.`, `Tap <b>Install</b> or ${add}.`, 'Confirm with <b>Add</b>.'];
+    default: return [`Tap ${DOTS_V} in the top corner.`, `Tap <b>Install app</b> or ${add}.`, 'Confirm with <b>Install</b>.'];
+  }
+}
+function showSplash(force) {
+  const p = devicePlatform();
+  if (!p || isInstalled() || (!force && store.get('installSeen', false))) return;
+  if ($('#splash')) return;
+  const el = document.createElement('div');
+  el.id = 'splash';
+  el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-labelledby', 'splashTitle');
+  el.innerHTML = `<div class="splash-card">
+    <img class="splash-icon" src="apple-touch-icon.png" alt="">
+    <h1 id="splashTitle">Spire Buddy</h1>
+    <p class="splash-lede">Add it to your Home Screen to use it like an app: full screen, works offline, updates itself with every patch.</p>
+    ${p.startsWith('android') || p === 'samsung' ? `<button id="instBtn" class="splash-primary" ${deferredInstall ? '' : 'hidden'}>Install Spire Buddy</button>` : ''}
+    <ol class="splash-steps">${installSteps(p).map(t => `<li>${t}</li>`).join('')}</ol>
+    <button id="splashOk" class="splash-ok">Got it</button>
+  </div>`;
+  document.body.appendChild(el);
+  document.body.classList.add('splash-open');
+  $('#splashOk').addEventListener('click', () => { store.set('installSeen', true); closeSplash(); });
+  $('#instBtn')?.addEventListener('click', async () => {
+    if (!deferredInstall) return;
+    deferredInstall.prompt();
+    const r = await deferredInstall.userChoice.catch(() => null);
+    deferredInstall = null;
+    if (r?.outcome === 'accepted') { store.set('installSeen', true); closeSplash(); }
+  });
+  $('#splashOk').focus();
+}
+function closeSplash() { $('#splash')?.remove(); document.body.classList.remove('splash-open'); }
+
 async function boot() {
   document.querySelectorAll('#branch button').forEach(b => b.addEventListener('click', () => setBranch(b.dataset.b)));
   $('#ascDown').addEventListener('click', () => setAsc(S.asc - 1));
@@ -999,6 +1059,7 @@ async function boot() {
   try { S.D = await loadBranch(S.branch); }
   catch (e) { $('#view').innerHTML = '<div class="empty">Couldn’t load game data. Check your connection and reopen.</div>'; return; }
   paintHeader(); route(false);
+  showSplash(new URLSearchParams(location.search).has('splash'));
   if ('serviceWorker' in navigator && location.hostname !== 'localhost') {
     // Check for a new version on every open / return to the app, and reload once when it takes over.
     navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then(reg => {
